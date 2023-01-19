@@ -1,0 +1,127 @@
+---
+title: "Project 0 - Introduction"
+subtitle: "Course DS 250"
+author: "Jared Linares"
+format:
+  html:
+    self-contained: true
+    page-layout: full
+    title-block-banner: true
+    toc: true
+    toc-depth: 3
+    toc-location: body
+    number-sections: false
+    html-math-method: katex
+    code-fold: true
+    code-summary: "Show the code"
+    code-overflow: wrap
+    code-copy: hover
+    code-tools:
+        source: false
+        toggle: true
+        caption: See code
+    
+---
+
+```{python}
+#| label: libraries
+#| include: false
+import pandas as pd
+import altair as alt
+
+```
+
+
+## Elevator pitch
+
+The findings from the reading and the code are simple, it shows that the newer the model year, the better the mpg. Additionally, the data sets show an inverse relationship between 'hwy' and 'displ' in the mpg dataset. This inverse relationship shows how the higher the displacement of the car, the lower the highway mileage.
+
+```{python}
+#| label: project data
+#| code-summary: Read and format project data
+# Include and execute your code here
+url = "https://github.com/byuidatascience/data4python4ds/raw/master/data-raw/mpg/mpg.csv"
+mpg = pd.read_csv(url)
+
+
+```
+
+
+## GRAND QUESTION 1
+
+__Finish the readings and be prepared with any questions to get your environment working smoothly (class for on-campus and Slack for online)__
+
+I did all the readings and asked my questions on the slack channel
+
+## GRAND QUESTION 2
+
+__In VS Code, write a python script to create the example Altair chart from section 3.2.2 of the textbook (part of the assigned readings). Note that you have to type chart to see the Altair chart after you create it.__
+
+In the code chunk below, I created a plot graph that shows the inverse relationship between 'hwy' and 'displ' in the mpg dataset. It shows how the higher the displacement of the car, the lower the highway mileage. 
+    
+```{python}
+    #| label: GQ2 chart
+    #| code-summary: Read and format data
+    #| fig-cap: plot graph"
+    # Include and execute your code here
+chart = alt.Chart(mpg).mark_circle().encode(
+    x='displ', 
+    y='hwy'
+    )
+
+chart
+
+```
+
+## GRAND QUESTION 3
+
+__Your final report should also include the markdown table created from the following (assuming you have mpg from question 2).__
+
+In this chart, the relationships between the manufacturer, model, year, and highway mileage are shown. The first five rows of the data are shown. Of the rows, the data shows that the newer the model year, the better the mpg.
+
+```{python}
+#| label: GQ3 code
+#| code-summary: Read and format data
+# Include and execute your code here
+
+(mpg
+    .head(5)
+    .filter(["manufacturer", "model","year", "hwy"]))
+```
+
+## APPENDIX A (Additional Python Code)
+
+```python
+#paste other your code from your python file (.py) here
+#%%
+import pandas as pd
+import altair as alt
+
+url = "https://github.com/byuidatascience/data4python4ds/raw/master/data-raw/mpg/mpg.csv"
+mpg = pd.read_csv(url)
+
+mpg.head()
+
+
+#%%
+# Question 1
+# I did all the readings and asked my questions on the slack channel
+
+# Question 2
+
+#%%
+
+chart = alt.Chart(mpg).mark_circle().encode(
+    x='displ', 
+    y='hwy'
+)
+
+chart
+#%%
+
+# Question 3
+(mpg
+    .head(5)
+    .filter(["manufacturer", "model","year", "hwy"]))
+#%%
+```
