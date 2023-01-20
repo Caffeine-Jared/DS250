@@ -1,7 +1,7 @@
 ---
-title: "Client Report - [Insert Project Title]"
+title: "Client Report - Name Analysis"
 subtitle: "Course DS 250"
-author: "[STUDENT NAME]"
+author: "Jared Linares"
 format:
   html:
     self-contained: true
@@ -69,7 +69,7 @@ my_name_chart1 = alt.Chart(my_name, title=title).mark_line().encode(
 # my_name_chart1 # calling the chart will display it
 # create a new rule to the chart
 new_rule = my_name.query("year == 1997")
-print(new_rule.head())
+# print(new_rule.head())
 my_name_chart2 = alt.Chart(new_rule).mark_circle(color="red", size=100).encode(
     x = 'year',
     y = 'Total',
@@ -78,23 +78,23 @@ my_name_chart1 + my_name_chart2 # call charts to display them
 
 #| label: GQ1 chart
 #| code-summary: In this code/chart I'm comparing the number of Jareds born in 1997 to the number of Jareds born where (Total > {subrule1_1}). Each of the read marks should indicate a year where the number of Jareds born was greater than the number of Jareds born in 1997.
-subrule1 = my_name.query("year == 1997 & Total")
+# subrule1 = my_name.query("year == 1997 & Total")
 # print(subrule1) # 6682 Jareds were born in 1997
+
+```
+
+_In the chart below, you can see all the points at which the popularity of the name "Jared" was greater than my birth year of 1997. The most recent year where the number of Jareds born was greater than the number of Jareds born in 1997 was 2000. This was also the year where Jared Fogle, an ex-spokesman, for Subway first appeared in a commercial. There's nothing worse than sharing a name with a known criminal._
+
+```{python}
 subrule1_1 = 6682 
 new_rule1 = my_name.query(f"Total > {subrule1_1}") # get all years where the number of Jareds born was greater than the number of Jareds born in 1997
 # print(new_rule1)
 my_name_chart3 = alt.Chart(new_rule1).mark_circle(color="blue", size=80).encode(
     x = 'year',
     y = 'Total',
-)
+).interactive()
+
 my_name_chart1 + my_name_chart2 + my_name_chart3
-```
-
-_In the chart below, you can see all the point at which the popularity of the name "Jared" was greater than my birth year of 1997. The most recent year where the number of Jareds born was greater than the number of Jareds born in 1997 was 2000. This was also the year where Jared Fogle, an ex-spokesman, for Subway first appeared in a commercial. There's nothing worse than sharing a name with a known criminal._
-
-```{python}
-
-
 ```
 
 
@@ -102,7 +102,7 @@ _In the chart below, you can see all the point at which the popularity of the na
 
 __If you talked to someone named Brittany on the phone, what is your guess of his or her age? What ages would you not guess?__
 
-_Assuming I were speaking on the phone with someone named Brittany, I would likely estimate their age to be between 29 and 37. This is due to the fact that the name Brittany was highly popular between the years 1985 and 1993, with over 10,000 new individuals given the name each year. Interestingly, the release of Britney Spears' album "Baby One More Time" in 1999 did not result in an increase in the number of people named Brittany. (album release marked in green)_
+_Assuming I were speaking on the phone with someone named Brittany, I would likely estimate their age to be between 29 and 37. This is due to the fact that the name Brittany was highly popular between the years 1985 and 1993, with over 10,000 new individuals given the name each year. Interestingly, the release of Britney Spears' album "Baby One More Time" in 1999 did not result in an increase in the number of people named Brittany._
 
 ```{python}
 #| label: GQ2
@@ -110,7 +110,7 @@ _Assuming I were speaking on the phone with someone named Brittany, I would like
 # Include and execute your code here
 # what are some of the dates in which the name "Brittany" was popular?
 brittany = dat.query("name == 'Brittany'")
-print(brittany.head())
+
 
 # create a line chart using altair
 # ensure that the X and Y axis are labeled correctly, and that the chart has a title
@@ -120,35 +120,43 @@ brittany_chart1 = alt.Chart(brittany, title=title).mark_line().encode(
     x = alt.X("year", title="Year", axis=alt.Axis(format="d")),
     y = alt.Y("Total", title="Number of Brittanys"),
 )
-brittany_chart1
-
-# create a new rule to the chart
-britt_rule = brittany.query("year > 1980 & year < 2005 & Total > 10000")
-print(britt_rule)
 britt_rule_1 = brittany.query("year == 1990")
-
 britt_rule_1_chart = alt.Chart(britt_rule_1).mark_circle(color="red", size=150).encode(
     x = 'year',
     y = 'Total',
 )
+brittany_chart1+britt_rule_1_chart
+```
+```{python}
+# create a new rule to the chart
+britt_rule = brittany.query("year > 1980 & year < 2005 & Total > 10000")
 
-britt_rule_2_chart = alt.Chart(britt_rule).mark_circle(color="blue", size=80).encode(
+# the result of the query above gives us the year in which the number of individuals named Brittany maxed (1990)
+britt_rule_2_chart = alt.Chart(britt_rule).mark_circle(size=80).encode(
     x = 'year',
     y = 'Total',
+    color = alt.value("#4010ff"),
 )
-brittany_chart1 + britt_rule_1_chart + britt_rule_2_chart
+brittany_chart1 + britt_rule_2_chart
+```
+_Here is a graph showing all the years in which the number of individuals named Brittany exceeded 10,000._
 
+### Interactive Chart
+```{python}
 britt_rule3 = brittany.query("year == 1999")
 
 britt_rule3_chart = alt.Chart(britt_rule3).mark_circle(color="green", size=80).encode(
     x = 'year',
     y = 'Total',
-)
-brittany_chart1 + britt_rule_1_chart + britt_rule_2_chart + britt_rule3_chart
+).interactive()
+brittany_chart1+britt_rule3_chart
 
 ```
-
-
+_This graph shows everything compiled, and highlights the release of Britney Spears' debut album._
+    
+```{python}
+brittany_chart1 + britt_rule_1_chart + britt_rule_2_chart + britt_rule3_chart
+```
 
 ## GRAND QUESTION 3
 
