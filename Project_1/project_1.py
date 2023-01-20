@@ -201,7 +201,7 @@ dat = pd.read_csv("https://github.com/byuidatascience/data4names/raw/master/data
 
 # __Think of a unique name from a famous movie. Plot the usage of that name and see how changes line up with the movie release. Does it look like the movie had an effect on usage?__
 
-movie_name = dat.query("name == 'Leia' & year > 1920")
+movie_name = dat.query("name == 'Leia' & year < 2005")
 
 movie_name_chart = alt.Chart(movie_name).mark_line().encode(
     x = alt.X("year", title="Year", axis=alt.Axis(format="d")),
@@ -209,6 +209,16 @@ movie_name_chart = alt.Chart(movie_name).mark_line().encode(
     color = alt.value("#FF0005"),
 ).interactive()
 
-movie_name_chart
+movie_rule = movie_name.query("year < 1985 & Total > 80").max()
+movie_rule1 = movie_name.query("year == 1980")
+
+movie_name_chart2 = alt.Chart(movie_rule1).mark_circle(color="red", size=80).encode(
+    x = 'year',
+    y = 'Total',
+    color = alt.value("#85FF00"),
+)
+print(movie_rule)
+
+movie_name_chart + movie_name_chart2
 
 #%%

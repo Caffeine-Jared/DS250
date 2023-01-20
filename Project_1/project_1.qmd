@@ -57,6 +57,7 @@ __How does your name at your birth year compare to its use historically?__
 _My name "Jared" was at its height of popularity when I was born in 1997, but since then, it has experienced a significant decrease in popularity. Currently, it is at its lowest point since 1930. One reason for this decline could be negative connotations associated with the name, which have developed over time through media or news stories._
 
 ```{python}
+my_name = dat.query("name == 'Jared'")
 #| label: GQ1
 #| code-summary: Read and format data
 # Include and execute your code here
@@ -66,7 +67,6 @@ my_name_chart1 = alt.Chart(my_name, title=title).mark_line().encode(
     y = alt.Y("Total", title="Number of Jareds"),
 )
 # my_name_chart1 # calling the chart will display it
-
 # create a new rule to the chart
 new_rule = my_name.query("year == 1997")
 print(new_rule.head())
@@ -75,11 +75,7 @@ my_name_chart2 = alt.Chart(new_rule).mark_circle(color="red", size=100).encode(
     y = 'Total',
 )
 my_name_chart1 + my_name_chart2 # call charts to display them
-```
 
-_In the chart below, you can see all the point at which the popularity of the name "Jared" was greater than my birth year of 1997. The most recent year where the number of Jareds born was greater than the number of Jareds born in 1997 was 2000. This was also the year where Jared Fogle, an ex-spokesman, for Subway first appeared in a commercial. There's nothing worse than sharing a name with a known criminal._
-
-```{python}
 #| label: GQ1 chart
 #| code-summary: In this code/chart I'm comparing the number of Jareds born in 1997 to the number of Jareds born where (Total > {subrule1_1}). Each of the read marks should indicate a year where the number of Jareds born was greater than the number of Jareds born in 1997.
 subrule1 = my_name.query("year == 1997 & Total")
@@ -92,6 +88,12 @@ my_name_chart3 = alt.Chart(new_rule1).mark_circle(color="blue", size=80).encode(
     y = 'Total',
 )
 my_name_chart1 + my_name_chart2 + my_name_chart3
+```
+
+_In the chart below, you can see all the point at which the popularity of the name "Jared" was greater than my birth year of 1997. The most recent year where the number of Jareds born was greater than the number of Jareds born in 1997 was 2000. This was also the year where Jared Fogle, an ex-spokesman, for Subway first appeared in a commercial. There's nothing worse than sharing a name with a known criminal._
+
+```{python}
+
 
 ```
 
@@ -286,7 +288,28 @@ display(mydat)
 
 __Think of a unique name from a famous movie. Plot the usage of that name and see how changes line up with the movie release. Does it look like the movie had an effect on usage?__
 
+_The release of the Star Wars movies in 1977, 1980 and 1983 led to a rise in the number of babies named Leia. The character Leia Organa, played by Carrie Fisher, was a strong, independent, and powerful female lead in the Star Wars franchise, and many parents were inspired by her character to name their daughters after her. The name Leia saw a spike in popularity in 1978 and continued to rise in the following years, with many parents choosing the name as a tribute to the iconic character. The name Leia has since become synonymous with the Star Wars franchise and has a special place in the hearts of many Star Wars fans._
 ```{python}
+# star wars
+movie_name = dat.query("name == 'Leia' & year < 2005")
+
+movie_name_chart = alt.Chart(movie_name).mark_line().encode(
+    x = alt.X("year", title="Year", axis=alt.Axis(format="d")),
+    y = alt.Y("Total", title="Number of Leias"),
+    color = alt.value("#FF0005"),
+).interactive()
+
+movie_rule = movie_name.query("year < 1985 & Total > 80").max()
+movie_rule1 = movie_name.query("year == 1980")
+
+movie_name_chart2 = alt.Chart(movie_rule1).mark_circle(color="red", size=80).encode(
+    x = 'year',
+    y = 'Total',
+    color = alt.value("#85FF00"),
+)
+print(movie_rule)
+
+movie_name_chart + movie_name_chart2
 
 ```
 
