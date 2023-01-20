@@ -54,7 +54,7 @@ __Highlight the grand questions__
 
 __How does your name at your birth year compare to its use historically?__
 
-_My name "Jared" was at its height of popularity when I was born in 1997, but since then, it has experienced a significant decrease in popularity. Currently, it is at its lowest point since 1930. One reason for this decline could be negative connotations associated with the name, which have developed over time through media or news stories._
+_My name "Jared" was near its height of popularity when I was born in 1997, but since then, it has experienced a significant decrease in popularity. Currently, it is at its lowest point since 1930. One reason for this decline could be negative connotations associated with the name, which have developed over time through media or news stories._
 
 ```{python}
 my_name = dat.query("name == 'Jared'")
