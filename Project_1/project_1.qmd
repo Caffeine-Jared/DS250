@@ -54,48 +54,44 @@ __Highlight the grand questions__
 
 __How does your name at your birth year compare to its use historically?__
 
-_type your results and analysis here_
+_My name "Jared" was at its height of popularity when I was born in 1997, but since then, it has experienced a significant decrease in popularity. Currently, it is at its lowest point since 1930. One reason for this decline could be negative connotations associated with the name, which have developed over time through media or news stories._
 
 ```{python}
 #| label: GQ1
 #| code-summary: Read and format data
 # Include and execute your code here
+title = "Number of Jareds born in each year"
+my_name_chart1 = alt.Chart(my_name, title=title).mark_line().encode(
+    x = alt.X("year", title="Year", axis=alt.Axis(format="d")),
+    y = alt.Y("Total", title="Number of Jareds"),
+)
+# my_name_chart1 # calling the chart will display it
 
-
+# create a new rule to the chart
+new_rule = my_name.query("year == 1997")
+print(new_rule.head())
+my_name_chart2 = alt.Chart(new_rule).mark_circle(color="red", size=100).encode(
+    x = 'year',
+    y = 'Total',
+)
+my_name_chart1 + my_name_chart2 # call charts to display them
 ```
 
-_include figures in chunks and discuss your findings in the figure._
+_In the chart below, you can see all the point at which the popularity of the name "Jared" was greater than my birth year of 1997. The most recent year where the number of Jareds born was greater than the number of Jareds born in 1997 was 2000. This was also the year where Jared Fogle, an ex-spokesman, for Subway first appeared in a commercial. There's nothing worse than sharing a name with a known criminal._
 
 ```{python}
 #| label: GQ1 chart
-#| code-summary: plot example
-#| fig-cap: "My useless chart"
-#| fig-align: center
-# Include and execute your code here
-alt.Chart(dat.head(200))\
-    .encode(x="name", y="AK")\
-    .mark_bar()\
-    .properties(
-        width=800,
-        height=300
-    )
-```
-
-
-```{python}
-#| label: GQ1 table
-#| code-summary: table example
-#| tbl-cap: "Not much of a table"
-#| tbl-cap-location: top
-# Include and execute your code here
-mydat = dat.head(1000)\
-    .groupby('year')\
-    .sum()\
-    .reset_index()\
-    .tail(10)\
-    .filter(["year", "AK","AR"])
-
-display(mydat)
+#| code-summary: In this code/chart I'm comparing the number of Jareds born in 1997 to the number of Jareds born where (Total > {subrule1_1}). Each of the read marks should indicate a year where the number of Jareds born was greater than the number of Jareds born in 1997.
+subrule1 = my_name.query("year == 1997 & Total")
+# print(subrule1) # 6682 Jareds were born in 1997
+subrule1_1 = 6682 
+new_rule1 = my_name.query(f"Total > {subrule1_1}") # get all years where the number of Jareds born was greater than the number of Jareds born in 1997
+# print(new_rule1)
+my_name_chart3 = alt.Chart(new_rule1).mark_circle(color="blue", size=80).encode(
+    x = 'year',
+    y = 'Total',
+)
+my_name_chart1 + my_name_chart2 + my_name_chart3
 
 ```
 
@@ -104,59 +100,154 @@ display(mydat)
 
 __If you talked to someone named Brittany on the phone, what is your guess of his or her age? What ages would you not guess?__
 
-_type your results and analysis here_
+_Assuming I were speaking on the phone with someone named Brittany, I would likely estimate their age to be between 29 and 37. This is due to the fact that the name Brittany was highly popular between the years 1985 and 1993, with over 10,000 new individuals given the name each year. Interestingly, the release of Britney Spears' album "Baby One More Time" in 1999 did not result in an increase in the number of people named Brittany. (album release marked in green)_
 
 ```{python}
 #| label: GQ2
 #| code-summary: Read and format data
 # Include and execute your code here
+# what are some of the dates in which the name "Brittany" was popular?
+brittany = dat.query("name == 'Brittany'")
+print(brittany.head())
 
+# create a line chart using altair
+# ensure that the X and Y axis are labeled correctly, and that the chart has a title
+
+title = "Number of Brittanys born in each year"
+brittany_chart1 = alt.Chart(brittany, title=title).mark_line().encode(
+    x = alt.X("year", title="Year", axis=alt.Axis(format="d")),
+    y = alt.Y("Total", title="Number of Brittanys"),
+)
+brittany_chart1
+
+# create a new rule to the chart
+britt_rule = brittany.query("year > 1980 & year < 2005 & Total > 10000")
+print(britt_rule)
+britt_rule_1 = brittany.query("year == 1990")
+
+britt_rule_1_chart = alt.Chart(britt_rule_1).mark_circle(color="red", size=150).encode(
+    x = 'year',
+    y = 'Total',
+)
+
+britt_rule_2_chart = alt.Chart(britt_rule).mark_circle(color="blue", size=80).encode(
+    x = 'year',
+    y = 'Total',
+)
+brittany_chart1 + britt_rule_1_chart + britt_rule_2_chart
+
+britt_rule3 = brittany.query("year == 1999")
+
+britt_rule3_chart = alt.Chart(britt_rule3).mark_circle(color="green", size=80).encode(
+    x = 'year',
+    y = 'Total',
+)
+brittany_chart1 + britt_rule_1_chart + britt_rule_2_chart + britt_rule3_chart
 
 ```
 
-_include figures in chunks and discuss your findings in the figure._
-
-```{python}
-#| label: GQ2 chart
-#| code-summary: plot example
-#| fig-cap: "My useless chart"
-#| fig-align: center
-# Include and execute your code here
-alt.Chart(dat.head(200))\
-    .encode(x = "name", y = "AK")\
-    .mark_bar()
-```
-
-
-```{python}
-#| label: GQ2 table
-#| code-summary: table example
-#| tbl-cap: "Not much of a table"
-#| tbl-cap-location: top
-# Include and execute your code here
-mydat = dat.head(1000)\
-    .groupby('year')\
-    .sum()\
-    .reset_index()\
-    .tail(10)\
-    .filter(["year", "AK","AR"])
-
-display(mydat)
-
-```
 
 
 ## GRAND QUESTION 3
 
 __Mary, Martha, Peter, and Paul are all Christian names. From 1920 - 2000, compare the name usage of each of the four names. What trends do you notice?__
 
-_type your results and analysis here_
+_This chart illustrates an intriguing pattern in which the names reached their peak popularity within a decade of each other. Furthermore, these names experienced a significant increase in popularity after World War II as many of the returning GIs started families and became part of the baby boomer generation. The post-war era was characterized by conservative values, and this is reflected in the popular Christian names of the time._
 
 ```{python}
 #| label: GQ3
 #| code-summary: Read and format data
 # Include and execute your code here
+# Mary (1920 - 2000)
+mary_name = dat.query("name == 'Mary' & year > 1920 & year < 2000")
 
+mary_name_chart = alt.Chart(mary_name).mark_line().encode(
+    x = alt.X("year", title="Year", axis=alt.Axis(format="d")),
+    y = alt.Y("Total", title="Number of Marys"),
+    color = alt.value("#FF0005"),
+)
+
+# Mary name query 2, 1950 max value
+# find the max value of the mary_name dataframe
+subrule2 = mary_name.query("year > 1920 & year < 2000 & Total > 50000").max()
+# query the mary_name dataframe for the year 1950 (year with max value)
+subrule2_1 = mary_name.query("year == 1950")
+
+mary_name_chart2 = alt.Chart(subrule2_1).mark_circle(color="red", size=80).encode(
+    x = 'year',
+    y = 'Total',
+    color = alt.value("#85FF00"),
+)
+
+# Martha (1920 - 2000)
+martha_name = dat.query("name == 'Martha' & year > 1920 & year < 2000")
+
+martha_name_chart = alt.Chart(martha_name).mark_line().encode(
+    x = alt.X("year", title="Year", axis=alt.Axis(format="d")),
+    y = alt.Y("Total", title="Number of Marthas"),
+    color = alt.value("#85FF00"),
+)
+
+# Martha name query 2, 1947 max value
+# find the max value of the martha_name dataframe
+subrule3 = martha_name.query("year > 1920 & year < 2000 & Total > 10700").max()
+
+# query the martha_name dataframe for the year 1947 (year with max value)
+subrule3_1 = martha_name.query("year == 1947")
+
+martha_name_chart2 = alt.Chart(subrule3_1).mark_circle(color="red", size=80).encode(
+    x = 'year',
+    y = 'Total',
+    color = alt.value("#FF0005"),
+)
+
+# Peter (1920 - 2000)
+peter_name = dat.query("name == 'Peter' & year > 1920 & year < 2000")
+
+peter_name_chart = alt.Chart(peter_name).mark_line().encode(
+    x = alt.X("year", title="Year", axis=alt.Axis(format="d")),
+    y = alt.Y("Total", title="Number of Peters"),
+    color = alt.value("#00FFFA"),
+)
+
+# Peter name query 2, max value
+# find the max value of the peter_name dataframe
+subrule5 = peter_name.query("year > 1920 & year < 2000 & Total > 10000").max()
+
+# query the peter_name dataframe for the year 1956 (year with max value)
+subrule5_1 = peter_name.query("year == 1956")
+
+peter_name_chart2 = alt.Chart(subrule5_1).mark_circle(color="red", size=80).encode(
+    x = 'year',
+    y = 'Total',
+    color = alt.value("#7A00FF"),
+)
+
+
+
+# Paul (1920 - 2000)
+paul_name = dat.query("name == 'Paul' & year > 1920 & year < 2000")
+
+paul_name_chart = alt.Chart(paul_name).mark_line().encode(
+    x = alt.X("year", title="Year", axis=alt.Axis(format="d")),
+    y = alt.Y("Total", title="Number of Pauls"),
+    color = alt.value("#7A00FF"),
+).interactive()
+
+# Paul name query 2, max value
+# find the max value of the paul_name dataframe
+subrule4 = paul_name.query("year > 1920 & year < 2000 & Total > 25000").max()
+
+# query the paul_name dataframe for the year 1981 (year with max value)
+subrule4_1 = paul_name.query("year == 1954")
+
+paul_name_chart2 = alt.Chart(subrule4_1).mark_circle(color="red", size=80).encode(
+    x = 'year',
+    y = 'Total',
+    color = alt.value("#00FFFA"),
+)
+
+mary_name_chart + mary_name_chart2 + martha_name_chart + martha_name_chart2 + peter_name_chart + peter_name_chart2 + paul_name_chart + paul_name_chart2
 
 ```
 
@@ -195,6 +286,9 @@ display(mydat)
 
 __Think of a unique name from a famous movie. Plot the usage of that name and see how changes line up with the movie release. Does it look like the movie had an effect on usage?__
 
+```{python}
+
+```
 
 ## APPENDIX A (Additional Python Code)
 
