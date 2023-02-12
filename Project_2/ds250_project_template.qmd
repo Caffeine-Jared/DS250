@@ -1,0 +1,243 @@
+---
+title: "Client Report - Late flights and missing data"
+subtitle: "Course DS 250"
+author: "Jared Linares"
+format:
+  html:
+    self-contained: true
+    page-layout: full
+    title-block-banner: true
+    toc: true
+    toc-depth: 3
+    toc-location: body
+    number-sections: false
+    html-math-method: katex
+    code-fold: true
+    code-summary: "Show the code"
+    code-overflow: wrap
+    code-copy: hover
+    code-tools:
+        source: false
+        toggle: true
+        caption: See code
+    
+---
+
+
+```{python}
+
+import pandas as pd
+import altair as alt
+import numpy as np
+
+from IPython.display import Markdown
+from IPython.display import display
+from tabulate import tabulate
+```
+
+
+## Elevator pitch
+
+_We studied flight delay data at airports and found out what causes delays and how often they happen. We fixed missing information in the data and calculated how many delays were due to weather. We found that SFO airport had the most weather-related delays and IAD had the least. This information can help airlines and airports reduce flight disruptions and improve the passenger experience._
+
+
+```{python}
+
+dat = pd.read_json("flights_missing.json")
+
+dat1 = pd.read_json("https://raw.githubusercontent.com/byuidatascience/data4missing/master/data-raw/flights_missing/flights_missing.json")
+```
+
+__Highlight the grand questions__
+
+## GRAND QUESTION 1
+
+__Which airport has the worst delays?__
+
+_The airport with the worst delays is O'Hare International Airport in Chicago. I found this by looking at how much total time flights were delayed at each airport. This is a better way to measure the impact of delays because it takes into account both how often flights are delayed and how long each delay is. It gives a clearer picture of which airports need the most help to reduce delays and improve their operations._
+
+
+```{python}
+
+delays = dat1.filter(items=['airport_code','minutes_delayed_total', 'num_of_flights_total', 'num_of_delays_late_aircraft'])
+
+delays['proportion_of_delayed_flights'] = delays['num_of_delays_late_aircraft'] / delays['num_of_flights_total']
+
+
+delays['average_delay_time_in_hours'] = delays['minutes_delayed_total'] / 60
+
+delays_grouped = delays.groupby('airport_code').sum()
+
+delays_grouped.reset_index(inplace=True)
+
+delays_grouped.rename(columns={'airport_code': 'Airport Code', 'num_of_flights_total': 'Total Flights',
+                               'num_of_delays_late_aircraft': 'Number of Delayed Flights',
+                               'proportion_of_delayed_flights': 'Proportion of Late Flights',
+                               'average_delay_time_in_hours': 'Average Delay (Hours)'}, inplace=True)
+
+delays_grouped['Worst Airport Ranking'] = delays_grouped['Average Delay (Hours)'].rank(ascending=False).astype(int)
+
+delays_grouped.sort_values(by='Average Delay (Hours)', ascending=False, inplace=True)
+
+delays_grouped.reset_index(drop=True, inplace=True)
+delays_grouped.index = delays_grouped.index + 1
+
+print(delays_grouped[['Worst Airport Ranking', 'Airport Code', 'Total Flights', 'Number of Delayed Flights', 'Proportion of Late Flights', 'Average Delay (Hours)']])
+
+
+```
+
+_The bar graph shows the average delay time at different airports. The graph shows that ORD and ATL have a lot of delays, with ORD having a slightly higher average delay. So, ORD can be considered one of the worst airports on the list._
+
+```{python}
+
+
+
+bar = alt.Chart(delays_grouped).mark_bar().encode(
+    x='Airport Code:N',
+    y='Average Delay (Hours):Q',
+    color='Airport Code:N'
+).properties(
+    title='Average Delay Time by Airport',
+    width=600,
+    height=400
+)
+
+bar
+
+
+
+```
+
+
+## GRAND QUESTION 2
+
+__What is the best month to fly if you want to avoid delays of any length?__
+
+_According to the data, November is the best month to fly if you want to avoid delays. It has the shortest delay time with 11,112,089 minutes (185,201 hours). The month with the longest delay is July with 20465456 minutes (341,090 hours), which is nearly double November's delay. September and October are also good months to fly, but you may want to be careful with delays in June and December._
+
+
+```{python}
+
+
+delays = dat.filter(items=['month','minutes_delayed_total'])
+
+delays = delays[delays['month'] != 'n/a']
+
+
+delays = delays.groupby('month').sum().reset_index()
+
+
+delays = delays.sort_values(by='minutes_delayed_total', ascending=True)
+
+
+delays = delays.reset_index(drop=True)
+delays.index += 1
+
+
+delays = delays.rename(columns={'minutes_delayed_total':'Total Minutes Delayed', 'month':'Month'})
+
+
+delays
+
+
+```
+
+_The bar chart shows that November and September have fewer delays compared to the other months._
+
+```{python}
+
+import altair as alt
+
+chart = alt.Chart(delays).mark_bar().encode(
+    x=alt.X('Month:O', sort='descending', axis=alt.Axis(title='Month')),
+    y=alt.Y('Total Minutes Delayed:Q', axis=alt.Axis(title='Total Minutes Delayed')),
+    color=alt.Color('Month:N'),
+)
+
+chart.title = 'Total Minutes Delayed by Month'
+chart
+```
+
+
+
+## GRAND QUESTION 3
+
+__Your job is to create a new column that calculates the total number of flights delayed by weather (both severe and mild).__
+    
+__1) All delayed flights in the "Weather" category are caused by weather.__
+__2) 30% of the delayed flights in the "Late-Arriving" category are caused by weather.__
+__3) From April to August, 40% of the delayed flights in the "NAS" category are caused by weather, but from other months the proportion increases to 65%.__
+
+
+
+```{python}
+
+
+
+dat['num_of_delays_late_aircraft'] = dat['num_of_delays_late_aircraft'].fillna(dat['num_of_delays_late_aircraft'].mean())
+
+dat['num_of_delays_due_to_weather'] = dat['num_of_delays_weather'] + dat['num_of_delays_late_aircraft'] * 0.3 + np.where((dat['month'].isin(['April', 'May', 'June', 'July', 'August'])), dat['num_of_delays_nas'] * 0.4, dat['num_of_delays_nas'] * 0.65)
+
+print(dat.head(5))
+
+
+```
+
+
+
+## GRAND QUESTION 4
+
+__Using the new weather variable calculated above, create a barplot showing the proportion of all flights that are delayed by weather at each airport. Discuss what you learn from this graph.__
+    
+
+_The graph compares the proportion of weather delays at SFO and IAD airports. It shows that SFO has more weather delays than IAD. This could be because of the location, climate, number of flights, and resources to handle weather disruptions at SFO. IAD, which has fewer weather delays, may be better equipped to handle weather or located in an area with less weather disruptions, resulting in fewer delays._
+
+
+```{python}
+
+
+
+mean_num_of_delays_late_aircraft = dat["num_of_delays_late_aircraft"].mean()
+dat["num_of_delays_late_aircraft"].fillna(mean_num_of_delays_late_aircraft, inplace=True)
+dat["prop_delayed_by_weather"] = dat["num_of_delays_due_to_weather"] / dat["num_of_flights_total"]
+
+
+
+
+
+prop = alt.Chart(dat).mark_bar().encode(
+    x='airport_code:N',
+    y='prop_delayed_by_weather:Q',
+    color='airport_code:N'
+)
+
+prop 
+
+
+
+
+```
+
+
+## GRAND QUESTION 5
+
+__Fix all of the varied missing data types in the data to be consistent (all missing values should be displayed as “NaN”).__
+
+_The data was cleaned by replacing missing values with "NaN". Here's an example row with the "airport-name" and "minutes-delayed-carrier" values replaced with "NaN"._
+    
+
+
+```{python}
+
+
+dat = dat.replace('NA', np.NaN)
+dat = dat.replace('N/A', np.NaN)
+dat = dat.replace('', np.NaN)
+dat = dat.replace('n/a', np.NaN)
+dat = dat.replace(-999, np.NaN)
+dat = dat.fillna(value="NaN")
+
+dat.iloc[2]
+
+```
