@@ -1,0 +1,159 @@
+---
+title: "Client Report - [Insert Project Title]"
+subtitle: "Course DS 250"
+author: "[STUDENT NAME]"
+format:
+  html:
+    self-contained: true
+    page-layout: full
+    title-block-banner: true
+    toc: true
+    toc-depth: 3
+    toc-location: body
+    number-sections: false
+    html-math-method: katex
+    code-fold: true
+    code-summary: "Show the code"
+    code-overflow: wrap
+    code-copy: hover
+    code-tools:
+        source: false
+        toggle: true
+        caption: See code
+    
+---
+
+```{python}
+import pandas as pd
+import altair as alt
+import numpy as np
+import sqlite3 
+
+from IPython.display import Markdown
+from IPython.display import display
+from tabulate import tabulate
+```
+
+
+## Elevator pitch
+
+When it comes to baseball, there are many factors that come into play in the makings of a professional player. 
+
+
+## GRAND QUESTION 1
+
+__Write an SQL query to create a new dataframe about baseball players who attended BYU-Idaho. The new table should contain five columns: playerID, schoolID, salary, and the yearID/teamID associated with each salary. Order the table by salary (highest to lowest) and print out the table in your report.__
+
+
+```{python}
+
+# GQ 1 
+# Write an SQL query to create a new dataframe about baseball players who attended BYU-Idaho. The new 
+# table should contain five columns: playerID, schoolID, salary, and the yearID/teamID associated with each 
+# salary. Order the table by salary (highest to lowest) and print out the table in your report.
+con = sqlite3.connect('lahmansbaseballdb.sqlite')
+
+query1 = """
+SELECT DISTINCT cp.playerid, cp.schoolid, s.salary, s.yearid, s.teamid
+FROM collegeplaying cp
+INNER JOIN salaries s on cp.playerid = s.playerid
+WHERE schoolid = 'idbyuid'
+ORDER BY salary DESC;
+"""
+
+q1_df = pd.read_sql_query(query1, con)
+print(q1_df)
+```
+
+
+## GRAND QUESTION 2
+
+__This three-part question requires you to calculate batting average (number of hits divided by the number of at-bats)__
+
+__Write an SQL query that provides playerID, yearID, and batting average for players with at least 1 at bat that year. Sort the table from highest batting average to lowest, and then by playerid alphabetically. Show the top 5 results in your report.__
+
+```{python}
+q2a_query = """
+SELECT playerID, yearID, ROUND(CAST(H AS FLOAT) / CAST(AB AS FLOAT), 3) AS AVG
+FROM batting
+WHERE AB > 0
+ORDER BY AVG DESC, playerID
+LIMIT 5;
+"""
+q2a_df = pd.read_sql_query(q2a_query, con)
+print(q2a_df)
+```
+
+__Use the same query as above, but only include players with at least 10 at bats that year. Print the top 5 results.__
+
+```{python}
+q2b_query = """
+SELECT playerID, yearID, ROUND(CAST(H AS FLOAT) / CAST(AB AS FLOAT), 3) AS AVG
+FROM batting
+WHERE AB >= 10
+ORDER BY AVG DESC, playerID
+LIMIT 5;
+
+"""
+q2b_df = pd.read_sql_query(q2b_query, con)
+print(q2b_df)
+```
+
+__Now calculate the batting average for players over their entire careers (all years combined). Only include players with at least 100 at bats, and print the top 5 results.__
+```{python}
+g2c_query = """
+SELECT playerID, ROUND(CAST(SUM(H) AS FLOAT) / CAST(SUM(AB) AS FLOAT), 3) AS career_batting_average
+FROM batting
+WHERE AB >= 100
+GROUP BY playerID
+ORDER BY career_batting_average DESC
+LIMIT 5;
+"""
+q2c_df = pd.read_sql_query(g2c_query, con)
+print(q2c_df)
+```
+
+
+## GRAND QUESTION 3
+
+__Pick any two baseball teams and compare them using a metric of your choice (average salary, home runs, number of wins, etc). Write an SQL query to get the data you need, then make a graph in Altair to visualize the comparison. What do you learn?__
+
+_type your results and analysis here_
+
+```{python}
+q3_query = """
+SELECT teams.teamID, SUM(batting.HR) AS total_home_runs, SUM(teams.W) AS total_wins
+FROM batting
+JOIN teams ON batting.yearID = teams.yearID AND batting.teamID = teams.teamID
+WHERE batting.yearID = 2019 AND batting.teamID IN ('NYA', 'BOS')
+GROUP BY teams.teamID;
+"""
+q3_df = pd.read_sql_query(q3_query, con)
+print(q3_df)
+
+# Create the scatter plot using Altair
+chart = alt.Chart(q3_df).mark_point().encode(
+    x='total_home_runs:Q',
+    y='total_wins:Q',
+    color=alt.condition(
+        alt.datum.teamID == 'NYA', # Highlight the Yankees in blue
+        alt.value('blue'),
+        alt.value('red') # Use red for the Red Sox
+    )
+).properties(
+    width=500,
+    height=300,
+    title='Comparison of 2021 Home Runs and Wins: NY Yankees vs Boston Red Sox'
+)
+
+chart
+```
+
+
+
+
+## APPENDIX A (Additional Python Code)
+
+```python
+#paste other your code from your python file (.py) here
+```
