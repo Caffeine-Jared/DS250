@@ -1,7 +1,7 @@
 ---
-title: "Client Report - [Insert Project Title]"
+title: "Client Report - Finding relationships in baseball"
 subtitle: "Course DS 250"
-author: "[STUDENT NAME]"
+author: "Jared Linares"
 format:
   html:
     self-contained: true
@@ -35,23 +35,26 @@ from tabulate import tabulate
 ```
 
 
+```{python}
+con = sqlite3.connect('lahmansbaseballdb.sqlite')
+
+```
+
+
+
 ## Elevator pitch
 
-When it comes to baseball, there are many factors that come into play in the makings of a professional player. 
+_Baseball metrics, or the statistical measures used to evaluate the performance of baseball players and teams, provide valuable insights into player abilities and team success. By using a range of metrics, analysts and fans can identify patterns in player and team performance, make more informed decisions about strategy and player acquisition, and assess a team's chances of success in a given season or matchup. These metrics are also used to evaluate players for awards and to optimize team management. If you're looking for a way to gain a competitive edge in baseball, or in business more broadly, understanding and utilizing baseball metrics can provide valuable insights and improve your decision-making processes._
 
 
 ## GRAND QUESTION 1
 
 __Write an SQL query to create a new dataframe about baseball players who attended BYU-Idaho. The new table should contain five columns: playerID, schoolID, salary, and the yearID/teamID associated with each salary. Order the table by salary (highest to lowest) and print out the table in your report.__
 
+_This is a table that lists the former BYU-Idaho students that have played in or are currently playing in the MLB, and sorts them by salary. This information can be used to evaluate the success of the school in developing high-earning players, and to identify trends in player salaries over time. Additionally, the query can help inform decisions about player recruitment and development strategies for the school._
+
 
 ```{python}
-
-# GQ 1 
-# Write an SQL query to create a new dataframe about baseball players who attended BYU-Idaho. The new 
-# table should contain five columns: playerID, schoolID, salary, and the yearID/teamID associated with each 
-# salary. Order the table by salary (highest to lowest) and print out the table in your report.
-con = sqlite3.connect('lahmansbaseballdb.sqlite')
 
 query1 = """
 SELECT DISTINCT cp.playerid, cp.schoolid, s.salary, s.yearid, s.teamid
@@ -62,8 +65,15 @@ ORDER BY salary DESC;
 """
 
 q1_df = pd.read_sql_query(query1, con)
-print(q1_df)
+
+q1_df.rename(columns={'playerID': 'Player ID', 'schoolID': 'School ID', 'salary': 'Salary', 'yearID': 'Year ID', 'teamID': 'Team ID'}, inplace=True)
+
+q1_df['Salary'] = q1_df['Salary'].map('${:,.2f}'.format)
+
+q1_df
+
 ```
+
 
 
 ## GRAND QUESTION 2
@@ -71,6 +81,8 @@ print(q1_df)
 __This three-part question requires you to calculate batting average (number of hits divided by the number of at-bats)__
 
 __Write an SQL query that provides playerID, yearID, and batting average for players with at least 1 at bat that year. Sort the table from highest batting average to lowest, and then by playerid alphabetically. Show the top 5 results in your report.__
+
+_This table presents a list of the highest batting averages in Major League Baseball history, arranged in alphabetical order. It is worth noting, however, that the data only includes players who had fewer than 10 'at bats' during their career, which allowed them to achieve a perfect batting average. This limited sample size is not representative of batting averages over a more extended period, and the chart below confirms this by demonstrating how averages with ten or more 'at bats' begin to decline substantially. While perfect batting averages may seem impressive, it is important to consider the context and recognize that they do not necessarily reflect the true skill level of a player. Batting averages are just one metric used to evaluate a player's performance, and looking at larger sample sizes is more likely to provide a more accurate assessment._
 
 ```{python}
 q2a_query = """
@@ -81,7 +93,10 @@ ORDER BY AVG DESC, playerID
 LIMIT 5;
 """
 q2a_df = pd.read_sql_query(q2a_query, con)
-print(q2a_df)
+
+q2a_df.rename(columns={'playerID': 'Player ID', 'yearID': 'Year ID', 'AVG': 'Batting Average'}, inplace=True)
+
+q2a_df
 ```
 
 __Use the same query as above, but only include players with at least 10 at bats that year. Print the top 5 results.__
@@ -96,10 +111,13 @@ LIMIT 5;
 
 """
 q2b_df = pd.read_sql_query(q2b_query, con)
-print(q2b_df)
+q2b_df.rename(columns={'playerID': 'Player ID', 'yearID': 'Year ID', 'AVG': 'Batting Average'}, inplace=True)
+q2b_df
 ```
 
 __Now calculate the batting average for players over their entire careers (all years combined). Only include players with at least 100 at bats, and print the top 5 results.__
+
+_The objective of this query is to identify the top 5 batters with the highest career batting averages in the database. While the averages may appear lower compared to the previous table, it is worth noting that these players have had a significant number of 'at bats' throughout their careers, making their averages a more accurate reflection of their performance. This table presents a list of players with the highest batting averages over their entire careers, showcasing their exceptional ability to get hits when at-bat. Batting average is a critical metric in baseball used to evaluate player performance and is a widely recognized measure of a batter's proficiency._
 ```{python}
 g2c_query = """
 SELECT playerID, ROUND(CAST(SUM(H) AS FLOAT) / CAST(SUM(AB) AS FLOAT), 3) AS career_batting_average
@@ -110,7 +128,8 @@ ORDER BY career_batting_average DESC
 LIMIT 5;
 """
 q2c_df = pd.read_sql_query(g2c_query, con)
-print(q2c_df)
+q2c_df.rename(columns={'playerID': 'Player ID', 'career_batting_average': 'Career Batting Average'}, inplace=True)
+q2c_df
 ```
 
 
@@ -118,42 +137,46 @@ print(q2c_df)
 
 __Pick any two baseball teams and compare them using a metric of your choice (average salary, home runs, number of wins, etc). Write an SQL query to get the data you need, then make a graph in Altair to visualize the comparison. What do you learn?__
 
-_type your results and analysis here_
+_In my analysis, I chose to compare the New York Yankees and the Boston Red Sox using two metrics: total home runs and total wins. Upon examining the data, I found that the Yankees had a significantly higher number of total home runs than the Red Sox. Specifically, the Red Sox hit a total of 13,712 home runs, while the Yankees hit 16,215 home runs throughout their history. This difference in home runs suggests that the Yankees were more successful in this aspect of the game than the Red Sox. Furthermore, this trend is also reflected in the two teams' total wins, with the Yankees once again outperforming the Red Sox. The Yankees have a total of 10,378 wins, while the Red Sox have 9,602 wins. This indicates that the Yankees have been more successful than the Red Sox in both the number of home runs hit and the total number of wins achieved over time._
 
 ```{python}
 q3_query = """
-SELECT teams.teamID, SUM(batting.HR) AS total_home_runs, SUM(teams.W) AS total_wins
-FROM batting
-JOIN teams ON batting.yearID = teams.yearID AND batting.teamID = teams.teamID
-WHERE batting.yearID = 2019 AND batting.teamID IN ('NYA', 'BOS')
+SELECT teams.teamID, SUM(teams.HR) AS total_home_runs, SUM(teams.W) AS total_wins
+FROM teams
+WHERE teams.yearID <= 2019 AND teams.teamID IN ('NYA', 'BOS')
 GROUP BY teams.teamID;
 """
 q3_df = pd.read_sql_query(q3_query, con)
-print(q3_df)
+q3_df.rename(columns={'teamID': 'Team ID', 'total_home_runs': 'Total Home Runs', 'total_wins': 'Total Wins'}, inplace=True)
+q3_df
+```
 
-# Create the scatter plot using Altair
-chart = alt.Chart(q3_df).mark_point().encode(
-    x='total_home_runs:Q',
-    y='total_wins:Q',
-    color=alt.condition(
-        alt.datum.teamID == 'NYA', # Highlight the Yankees in blue
-        alt.value('blue'),
-        alt.value('red') # Use red for the Red Sox
-    )
+```{python}
+
+hr_chart = alt.Chart(q3_df).mark_bar().encode(
+    x='Team ID:N',
+    y='Total Home Runs:Q',
+    color='Team ID:N'
 ).properties(
     width=500,
     height=300,
-    title='Comparison of 2021 Home Runs and Wins: NY Yankees vs Boston Red Sox'
+    title='Comparison of Home Runs: NY Yankees vs Boston Red Sox'
 )
 
-chart
+hr_chart
 ```
 
 
+```{python}
 
-
-## APPENDIX A (Additional Python Code)
-
-```python
-#paste other your code from your python file (.py) here
+wins_chart = alt.Chart(q3_df).mark_bar().encode(
+    x='Team ID:N',
+    y='Total Wins:Q',
+    color='Team ID:N'
+).properties(
+    width=500,
+    height=300,
+    title='Comparison of Wins: NY Yankees vs Boston Red Sox'
+)
+wins_chart
 ```

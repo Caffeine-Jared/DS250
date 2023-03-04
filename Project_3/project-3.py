@@ -72,3 +72,10 @@ GROUP BY teams.teamID;
 """
 q3_df = pd.read_sql_query(q3_query, con)
 print(q3_df)
+
+query = 'SELECT * FROM batting LIMIT 2'
+qr = pd.read_sql_query(query, con)
+
+print(qr)
+
+
