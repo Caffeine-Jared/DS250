@@ -45,46 +45,28 @@ _A SHORT (4-5 SENTENCES) PARAGRAPH THAT `SUMMARIZES` THE WORK REQUESTED INCLUDIN
 _A Client has requested this analysis and  this is your one shot of  what you would say to your boss in a 2min elevator ride before he takes your report and hands it to the client._
 
 ```{python}
-import pandas as pd
-import altair as alt
 
-alt.data_transformers.disable_max_rows()
+# chart 1: stories vs before1980
+chart1 = alt.Chart(dwellings_ml_df, title="Homes w/ One Story are most likely to be built before 1980").mark_bar().encode(
+    alt.X('before1980:N', title=""),
+    alt.Y('count(stories)', title="Count of Homes"),
+    alt.Color('before1980:N', title="Built Before 1980?"),
+    alt.Column('stories')
+).interactive()
 
-dwellings_ml_df = pd.read_csv('dwellings_ml.csv')
-dwellings_ml_df.head()
-dwellings_ml_df.shape
+# live area
 
-alt.Chart(dwellings_ml_df).mark_circle().encode(
-    x='sprice:Q',
-    y='before1980:N',
-    color='before1980:N',
+chart2 = alt.Chart(dwellings_ml_df).transform_density(
+    'livearea',
+    as_=['livearea', 'density'],
+    groupby=['before1980']
+).mark_area(opacity=.5).encode(
+    x="livearea",
+    y="density:Q",
+    color="before1980:N"
 ).interactive()
 
 
-
-
-
-
-# # chart 2: home age vs. before1980
-# alt.Chart(dwellings_ml_df).mark_circle().encode(
-#     x='home_age',
-#     y='before1980',
-#     color='before1980'
-# ).interactive()
-
-# # chart 3: home size vs. before1980
-# alt.Chart(dwellings_ml_df).mark_circle().encode(
-#     x='home_size',
-#     y='before1980',
-#     color='before1980'
-# ).interactive()
-
-# # chart 4: home size vs. home value
-# alt.Chart(dwellings_ml_df).mark_circle().encode(
-#     x='home_size',
-#     y='home_value',
-#     color='before1980'
-# ).interactive()
 ```
 
 __Highlight the grand questions__
