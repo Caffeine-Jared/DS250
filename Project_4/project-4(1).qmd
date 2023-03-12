@@ -26,13 +26,14 @@ format:
 _THIS `.qmd` FILE SHOULD BE USED TO WRITE YOUR REPORT.  YOU WILL NEED TO COMPILE THE REPORT INTO A `.html` DOCUMENT AND SUBMIT IT ON CANVAS._
 
 ```{python}
-
-import matplotlib.pyplot as plt
+#| label: libraries
+#| include: false
 import pandas as pd 
 import altair as alt 
 import numpy as np 
 import altair as alt
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
 from sklearn import tree
