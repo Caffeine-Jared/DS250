@@ -1,0 +1,16 @@
+// Expression 5: a^2 + b^2
+digraph {
+	"+" [label="+"]
+	"^" [label="^"]
+	a [label=a]
+	2 [label=2]
+	"^1" [label="^"]
+	b [label=b]
+	"2_1" [label=2]
+	"+" -> "^"
+	"^" -> a
+	"^" -> 2
+	"+" -> "^1"
+	"^1" -> b
+	"^1" -> "2_1"
+}

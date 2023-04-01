@@ -1,0 +1,12 @@
+// Expression 2: ab + c
+digraph {
+	"+" [label="+"]
+	"*" [label="*"]
+	a [label=a]
+	b [label=b]
+	c [label=c]
+	"+" -> "*"
+	"+" -> c
+	"*" -> a
+	"*" -> b
+}

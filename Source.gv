@@ -1,0 +1,11 @@
+
+graph tree { 
+  layout=dot
+  node [shape=circle]
+  "+"--"*";
+  "*"--a;
+  "*"--"a ";
+  "+"--"* ";
+  "* "--b;
+  "* "--"b ";
+}
