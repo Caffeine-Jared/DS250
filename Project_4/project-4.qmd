@@ -1,7 +1,7 @@
 ---
 title: "Client Report - Can you predict that?"
 subtitle: "Course DS 250"
-author: "Jared Linares"
+author: "Seth Linares"
 format:
   html:
     self-contained: true
@@ -26,13 +26,14 @@ format:
 _THIS `.qmd` FILE SHOULD BE USED TO WRITE YOUR REPORT.  YOU WILL NEED TO COMPILE THE REPORT INTO A `.html` DOCUMENT AND SUBMIT IT ON CANVAS._
 
 ```{python}
-
-import matplotlib.pyplot as plt
+#| label: libraries
+#| include: false
 import pandas as pd 
 import altair as alt 
 import numpy as np 
 import altair as alt
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
 from sklearn import tree
@@ -53,12 +54,13 @@ _This project uses machine learning techniques to predict whether a dwelling was
 
 ```{python}
 
-dwellings_ml = pd.read_csv('dwellings_ml.csv')
-dwellings_denver = pd.read_csv('dwellings_denver.csv')
-dwellings_neighborhoods_ml = pd.read_csv('dwellings_neighborhoods_ml.csv')
+
+url = 'https://raw.githubusercontent.com/byuidatascience/data4dwellings/master/data-raw/dwellings_ml/dwellings_ml.csv'
+dwellings_ml = pd.read_csv(url)
+
 
 alt.data_transformers.disable_max_rows()
-alt.data_transformers.enable('data_server')
+alt.data_transformers.enable('json')
 ```
 
 
@@ -70,6 +72,10 @@ __Create 2-3 charts that evaluate potential relationships between the home varia
 ```{python}
 
 sns.scatterplot(x='finbsmnt', y='basement', hue='before1980', data=dwellings_ml)
+plt.title('Basement Area vs. Finished Basement Area')
+plt.xlabel('Finished Basement Area')
+plt.ylabel('Basement Area')
+plt.show()
 
 ```
 
