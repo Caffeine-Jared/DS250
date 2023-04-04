@@ -59,9 +59,9 @@ _This is a table that lists the former BYU-Idaho students that have played in or
 query1 = """
 SELECT DISTINCT cp.playerid, cp.schoolid, s.salary, s.yearid, s.teamid
 FROM collegeplaying cp
-INNER JOIN salaries s on cp.playerid = s.playerid
-WHERE schoolid = 'idbyuid'
-ORDER BY salary DESC;
+LEFT JOIN salaries s on cp.playerid = s.playerid
+WHERE cp.schoolid = 'idbyuid'
+ORDER BY s.salary DESC;
 """
 
 q1_df = pd.read_sql_query(query1, con)
@@ -99,7 +99,7 @@ q2a_df.rename(columns={'playerID': 'Player ID', 'yearID': 'Year ID', 'AVG': 'Bat
 q2a_df
 ```
 
-__Use the same query as above, but only include players with at least 10 at bats that year. Print the top 5 results.__
+__Use the same query as above, but only include players with at least 10 at bats that year. Print the top     5 results.__
 
 ```{python}
 q2b_query = """
@@ -122,8 +122,8 @@ _The objective of this query is to identify the top 5 batters with the highest c
 g2c_query = """
 SELECT playerID, ROUND(CAST(SUM(H) AS FLOAT) / CAST(SUM(AB) AS FLOAT), 3) AS career_batting_average
 FROM batting
-WHERE AB >= 100
 GROUP BY playerID
+HAVING SUM(AB) >= 100
 ORDER BY career_batting_average DESC
 LIMIT 5;
 """

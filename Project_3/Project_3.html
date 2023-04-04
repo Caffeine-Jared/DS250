@@ -2680,9 +2680,9 @@ vertical-align: -.125em;
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>query1 <span class="op">=</span> <span class="st">&quot;&quot;&quot;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT DISTINCT cp.playerid, cp.schoolid, s.salary, s.yearid, s.teamid</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="st">FROM collegeplaying cp</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="st">INNER JOIN salaries s on cp.playerid = s.playerid</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE schoolid = &#39;idbyuid&#39;</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY salary DESC;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="st">LEFT JOIN salaries s on cp.playerid = s.playerid</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE cp.schoolid = &#39;idbyuid&#39;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY s.salary DESC;</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>q1_df <span class="op">=</span> pd.read_sql_query(query1, con)</span>
@@ -2714,7 +2714,7 @@ vertical-align: -.125em;
       <td>lindsma01</td>
       <td>idbyuid</td>
       <td>$4,000,000.00</td>
-      <td>2014</td>
+      <td>2014.0</td>
       <td>CHA</td>
     </tr>
     <tr>
@@ -2722,7 +2722,7 @@ vertical-align: -.125em;
       <td>lindsma01</td>
       <td>idbyuid</td>
       <td>$3,600,000.00</td>
-      <td>2012</td>
+      <td>2012.0</td>
       <td>BAL</td>
     </tr>
     <tr>
@@ -2730,7 +2730,7 @@ vertical-align: -.125em;
       <td>lindsma01</td>
       <td>idbyuid</td>
       <td>$2,800,000.00</td>
-      <td>2011</td>
+      <td>2011.0</td>
       <td>COL</td>
     </tr>
     <tr>
@@ -2738,7 +2738,7 @@ vertical-align: -.125em;
       <td>lindsma01</td>
       <td>idbyuid</td>
       <td>$2,300,000.00</td>
-      <td>2013</td>
+      <td>2013.0</td>
       <td>CHA</td>
     </tr>
     <tr>
@@ -2746,7 +2746,7 @@ vertical-align: -.125em;
       <td>lindsma01</td>
       <td>idbyuid</td>
       <td>$1,625,000.00</td>
-      <td>2010</td>
+      <td>2010.0</td>
       <td>HOU</td>
     </tr>
     <tr>
@@ -2754,7 +2754,7 @@ vertical-align: -.125em;
       <td>stephga01</td>
       <td>idbyuid</td>
       <td>$1,025,000.00</td>
-      <td>2001</td>
+      <td>2001.0</td>
       <td>SLN</td>
     </tr>
     <tr>
@@ -2762,7 +2762,7 @@ vertical-align: -.125em;
       <td>stephga01</td>
       <td>idbyuid</td>
       <td>$900,000.00</td>
-      <td>2002</td>
+      <td>2002.0</td>
       <td>SLN</td>
     </tr>
     <tr>
@@ -2770,7 +2770,7 @@ vertical-align: -.125em;
       <td>stephga01</td>
       <td>idbyuid</td>
       <td>$800,000.00</td>
-      <td>2003</td>
+      <td>2003.0</td>
       <td>SLN</td>
     </tr>
     <tr>
@@ -2778,7 +2778,7 @@ vertical-align: -.125em;
       <td>stephga01</td>
       <td>idbyuid</td>
       <td>$550,000.00</td>
-      <td>2000</td>
+      <td>2000.0</td>
       <td>SLN</td>
     </tr>
     <tr>
@@ -2786,7 +2786,7 @@ vertical-align: -.125em;
       <td>lindsma01</td>
       <td>idbyuid</td>
       <td>$410,000.00</td>
-      <td>2009</td>
+      <td>2009.0</td>
       <td>FLO</td>
     </tr>
     <tr>
@@ -2794,7 +2794,7 @@ vertical-align: -.125em;
       <td>lindsma01</td>
       <td>idbyuid</td>
       <td>$395,000.00</td>
-      <td>2008</td>
+      <td>2008.0</td>
       <td>FLO</td>
     </tr>
     <tr>
@@ -2802,7 +2802,7 @@ vertical-align: -.125em;
       <td>lindsma01</td>
       <td>idbyuid</td>
       <td>$380,000.00</td>
-      <td>2007</td>
+      <td>2007.0</td>
       <td>FLO</td>
     </tr>
     <tr>
@@ -2810,7 +2810,7 @@ vertical-align: -.125em;
       <td>stephga01</td>
       <td>idbyuid</td>
       <td>$215,000.00</td>
-      <td>1999</td>
+      <td>1999.0</td>
       <td>SLN</td>
     </tr>
     <tr>
@@ -2818,7 +2818,7 @@ vertical-align: -.125em;
       <td>stephga01</td>
       <td>idbyuid</td>
       <td>$185,000.00</td>
-      <td>1998</td>
+      <td>1998.0</td>
       <td>PHI</td>
     </tr>
     <tr>
@@ -2826,8 +2826,16 @@ vertical-align: -.125em;
       <td>stephga01</td>
       <td>idbyuid</td>
       <td>$150,000.00</td>
-      <td>1997</td>
+      <td>1997.0</td>
       <td>PHI</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>catetr01</td>
+      <td>idbyuid</td>
+      <td>$nan</td>
+      <td>NaN</td>
+      <td>None</td>
     </tr>
   </tbody>
 </table>
@@ -2978,8 +2986,8 @@ vertical-align: -.125em;
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>g2c_query <span class="op">=</span> <span class="st">&quot;&quot;&quot;</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT playerID, ROUND(CAST(SUM(H) AS FLOAT) / CAST(SUM(AB) AS FLOAT), 3) AS career_batting_average</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="st">FROM batting</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE AB &gt;= 100</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY playerID</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY playerID</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="st">HAVING SUM(AB) &gt;= 100</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY career_batting_average DESC</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="st">LIMIT 5;</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span></span>
@@ -3002,28 +3010,28 @@ vertical-align: -.125em;
   <tbody>
     <tr>
       <th>0</th>
-      <td>hazlebo01</td>
-      <td>0.403</td>
+      <td>cobbty01</td>
+      <td>0.366</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>daviscu01</td>
-      <td>0.381</td>
+      <td>barnero01</td>
+      <td>0.360</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>fishesh01</td>
-      <td>0.374</td>
+      <td>hornsro01</td>
+      <td>0.358</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>woltery01</td>
-      <td>0.370</td>
+      <td>jacksjo01</td>
+      <td>0.356</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>cobbty01</td>
-      <td>0.366</td>
+      <td>meyerle01</td>
+      <td>0.356</td>
     </tr>
   </tbody>
 </table>
@@ -3096,13 +3104,13 @@ vertical-align: -.125em;
 </details>
 <div class="cell-output cell-output-display" data-execution_count="8">
 
-<div id="altair-viz-e6ae3596b09b4d069aeb649caac7aec4"></div>
+<div id="altair-viz-e5c9b3fc02034a30b8770fd2caab7ddb"></div>
 <script type="text/javascript">
   var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
   (function(spec, embedOpt){
     let outputDiv = document.currentScript.previousElementSibling;
-    if (outputDiv.id !== "altair-viz-e6ae3596b09b4d069aeb649caac7aec4") {
-      outputDiv = document.getElementById("altair-viz-e6ae3596b09b4d069aeb649caac7aec4");
+    if (outputDiv.id !== "altair-viz-e5c9b3fc02034a30b8770fd2caab7ddb") {
+      outputDiv = document.getElementById("altair-viz-e5c9b3fc02034a30b8770fd2caab7ddb");
     }
     const paths = {
       "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",
@@ -3168,13 +3176,13 @@ vertical-align: -.125em;
 </details>
 <div class="cell-output cell-output-display" data-execution_count="9">
 
-<div id="altair-viz-0a24c01660894d8a9b9d9c93ba011566"></div>
+<div id="altair-viz-a48249123f5c4cdd833be25dc2a114df"></div>
 <script type="text/javascript">
   var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
   (function(spec, embedOpt){
     let outputDiv = document.currentScript.previousElementSibling;
-    if (outputDiv.id !== "altair-viz-0a24c01660894d8a9b9d9c93ba011566") {
-      outputDiv = document.getElementById("altair-viz-0a24c01660894d8a9b9d9c93ba011566");
+    if (outputDiv.id !== "altair-viz-a48249123f5c4cdd833be25dc2a114df") {
+      outputDiv = document.getElementById("altair-viz-a48249123f5c4cdd833be25dc2a114df");
     }
     const paths = {
       "vega": "https://cdn.jsdelivr.net/npm//vega@5?noext",

@@ -63,12 +63,11 @@ delays = dat1.filter(items=['airport_code','minutes_delayed_total', 'num_of_flig
 
 delays['proportion_of_delayed_flights'] = delays['num_of_delays_late_aircraft'] / delays['num_of_flights_total']
 
-
-delays['average_delay_time_in_hours'] = delays['minutes_delayed_total'] / 60
-
-delays_grouped = delays.groupby('airport_code').sum()
+delays_grouped = delays.groupby('airport_code').agg({'minutes_delayed_total': 'sum', 'num_of_flights_total': 'sum', 'num_of_delays_late_aircraft': 'sum', 'proportion_of_delayed_flights': 'sum'})
 
 delays_grouped.reset_index(inplace=True)
+
+delays_grouped['average_delay_time_in_hours'] = delays_grouped['minutes_delayed_total'] / (60 * delays_grouped['num_of_flights_total'])
 
 delays_grouped.rename(columns={'airport_code': 'Airport Code', 'num_of_flights_total': 'Total Flights',
                                'num_of_delays_late_aircraft': 'Number of Delayed Flights',
@@ -118,28 +117,27 @@ _According to the data, November is the best month to fly if you want to avoid d
 
 
 ```{python}
+import altair as alt
 
+months_order = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 delays = dat.filter(items=['month','minutes_delayed_total'])
 
 delays = delays[delays['month'] != 'n/a']
 
-
 delays = delays.groupby('month').sum().reset_index()
 
-
 delays = delays.sort_values(by='minutes_delayed_total', ascending=True)
-
 
 delays = delays.reset_index(drop=True)
 delays.index += 1
 
-
 delays = delays.rename(columns={'minutes_delayed_total':'Total Minutes Delayed', 'month':'Month'})
 
-
-delays
-
+alt.Chart(delays).mark_bar().encode(
+    x=alt.X('Month:N', sort=months_order),
+    y='Total Minutes Delayed:Q',
+)
 
 ```
 
@@ -195,27 +193,19 @@ _The graph compares the proportion of weather delays at SFO and IAD airports. It
 
 
 ```{python}
-
-
-
 mean_num_of_delays_late_aircraft = dat["num_of_delays_late_aircraft"].mean()
 dat["num_of_delays_late_aircraft"].fillna(mean_num_of_delays_late_aircraft, inplace=True)
 dat["prop_delayed_by_weather"] = dat["num_of_delays_due_to_weather"] / dat["num_of_flights_total"]
-
-
-
-
 
 prop = alt.Chart(dat).mark_bar().encode(
     x='airport_code:N',
     y='prop_delayed_by_weather:Q',
     color='airport_code:N'
+).properties(
+    title='Proportion of Flights Delayed by Weather per Airport'
 )
 
-prop 
-
-
-
+prop
 
 ```
 

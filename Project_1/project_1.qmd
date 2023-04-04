@@ -58,9 +58,6 @@ _My name "Jared" was near its height of popularity when I was born in 1997, but 
 
 ```{python}
 my_name = dat.query("name == 'Jared'")
-#| label: GQ1
-#| code-summary: Read and format data
-# Include and execute your code here
 title = "Number of Jareds born in each year"
 my_name_chart1 = alt.Chart(my_name, title=title).mark_line().encode(
     x = alt.X("year", title="Year", axis=alt.Axis(format="d")),
@@ -76,7 +73,6 @@ my_name_chart2 = alt.Chart(new_rule).mark_circle(color="red", size=100).encode(
 )
 my_name_chart1 + my_name_chart2 # call charts to display them
 
-#| label: GQ1 chart
 #| code-summary: In this code/chart I'm comparing the number of Jareds born in 1997 to the number of Jareds born where (Total > {subrule1_1}). Each of the read marks should indicate a year where the number of Jareds born was greater than the number of Jareds born in 1997.
 # subrule1 = my_name.query("year == 1997 & Total")
 # print(subrule1) # 6682 Jareds were born in 1997
@@ -86,15 +82,19 @@ my_name_chart1 + my_name_chart2 # call charts to display them
 _In the chart below, you can see all the points at which the popularity of the name "Jared" was greater than my birth year of 1997. The most recent year where the number of Jareds born was greater than the number of Jareds born in 1997 was 2000. This was also the year where Jared Fogle, an ex-spokesman, for Subway first appeared in a commercial. There's nothing worse than sharing a name with a known criminal._
 
 ```{python}
+title = "Number of Jareds born was greater than the number of Jareds born in 1997"
+
 subrule1_1 = 6682 
 new_rule1 = my_name.query(f"Total > {subrule1_1}") # get all years where the number of Jareds born was greater than the number of Jareds born in 1997
 # print(new_rule1)
-my_name_chart3 = alt.Chart(new_rule1).mark_circle(color="blue", size=80).encode(
+my_name_chart3 = alt.Chart(new_rule1, title=title).mark_circle(color="blue", size=80).encode(
     x = 'year',
     y = 'Total',
 ).interactive()
 
-my_name_chart1 + my_name_chart2 + my_name_chart3
+title = "Number of Jareds born was greater than the number of Jareds born in 1997"
+(my_name_chart1 + my_name_chart2 + my_name_chart3).properties(title=title)
+
 ```
 
 
@@ -137,7 +137,8 @@ britt_rule_2_chart = alt.Chart(britt_rule).mark_circle(size=80).encode(
     y = 'Total',
     color = alt.value("#4010ff"),
 )
-brittany_chart1 + britt_rule_2_chart
+title = "Brittanys Born per Year (>10,000 births)"
+(my_name_chart1 + my_name_chart2 + my_name_chart3).properties(title=title)
 ```
 _Here is a graph showing all the years in which the number of individuals named Brittany exceeded 10,000._
 
@@ -149,13 +150,16 @@ britt_rule3_chart = alt.Chart(britt_rule3).mark_circle(color="green", size=80).e
     x = 'year',
     y = 'Total',
 ).interactive()
-brittany_chart1+britt_rule3_chart
+
+title = "Brittanys Born During Britney Spears' Debut"
+(my_name_chart1 + my_name_chart2 + my_name_chart3).properties(title=title)
 
 ```
 _This graph shows everything compiled, and highlights the release of Britney Spears' debut album._
     
 ```{python}
-brittany_chart1 + britt_rule_1_chart + britt_rule_2_chart + britt_rule3_chart
+title = "Exploring the Popularity of the Name Brittany: Births during Britney Spears' Debut and Brittanys Born per Year (>10,000 births)"
+(my_name_chart1 + my_name_chart2 + my_name_chart3).properties(title=title)
 ```
 
 ## GRAND QUESTION 3
@@ -257,7 +261,11 @@ paul_name_chart2 = alt.Chart(subrule4_1).mark_circle(color="red", size=80).encod
     color = alt.value("#00FFFA"),
 )
 
-mary_name_chart + mary_name_chart2 + martha_name_chart + martha_name_chart2 + peter_name_chart + peter_name_chart2 + paul_name_chart + paul_name_chart2
+title = "Trends of Popular Names (Mary, Martha, Peter, Paul) in the 20th Century"
+
+(mary_name_chart + mary_name_chart2 + martha_name_chart + martha_name_chart2
++ peter_name_chart + peter_name_chart2 + paul_name_chart + paul_name_chart2).properties(title=title)
+
 
 ```
 
@@ -284,8 +292,8 @@ movie_name_chart2 = alt.Chart(movie_rule1).mark_circle(color="red", size=80).enc
     y = 'Total',
     color = alt.value("#85FF00"),
 )
-
-movie_name_chart + movie_name_chart2
+title = "Trend of the Name Leia and Highlight on Year of Star Wars Release (1980)"
+(movie_name_chart + movie_name_chart2).properties(title=title)
 ```
 
 ## APPENDIX A (Additional Python Code)
