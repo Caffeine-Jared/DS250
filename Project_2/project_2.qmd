@@ -33,6 +33,7 @@ import numpy as np
 from IPython.display import Markdown
 from IPython.display import display
 from tabulate import tabulate
+from IPython.core.display import HTML
 ```
 
 
@@ -42,10 +43,29 @@ _We studied flight delay data at airports and found out what causes delays and h
 
 
 ```{python}
+url = "https://raw.githubusercontent.com/byuidatascience/data4missing/master/data-raw/flights_missing/flights_missing.json"
+df = pd.read_json(url)
+df.to_csv("flights_missing_original.csv", index=False)
 
-dat = pd.read_json("flights_missing.json")
+df = df.replace({
+    'airport_name': '',
+    'minutes_delayed_carrier': '',
+    'num_of_delays_carrier': '1500+',
+    'num_of_delays_late_aircraft': -999,
+    'minutes_delayed_nas': [-999, ''],
+    'year': '',
+    'month': 'n/a'
+}, np.nan)
 
-dat1 = pd.read_json("https://raw.githubusercontent.com/byuidatascience/data4missing/master/data-raw/flights_missing/flights_missing.json")
+airport_dict = {
+    'ATL': 'Atlanta, GA: Hartsfield-Jackson Atlanta International',
+    'DEN': 'Denver, CO: Denver International',
+    'IAD': 'Washington, DC: Washington Dulles International',
+    'ORD': "Chicago, IL: Chicago O'Hare International",
+    'SAN': 'San Diego, CA: San Diego International',
+    'SFO': 'San Francisco, CA: San Francisco International',
+    'SLC': 'Salt Lake City, UT: Salt Lake City International'
+}
 ```
 
 __Highlight the grand questions__
@@ -59,53 +79,33 @@ _The airport with the worst delays is O'Hare International Airport in Chicago. I
 
 ```{python}
 
-delays = dat1.filter(items=['airport_code','minutes_delayed_total', 'num_of_flights_total', 'num_of_delays_late_aircraft'])
+df['airport_name'] = df['airport_name'].fillna(df['airport_code'].map(airport_dict))
 
-delays['proportion_of_delayed_flights'] = delays['num_of_delays_late_aircraft'] / delays['num_of_flights_total']
+df.to_csv("flights_missing.csv", index=False)
 
-delays_grouped = delays.groupby('airport_code').agg({'minutes_delayed_total': 'sum', 'num_of_flights_total': 'sum', 'num_of_delays_late_aircraft': 'sum', 'proportion_of_delayed_flights': 'sum'})
+df = df.assign(hours_delayed_total = df.minutes_delayed_total / 60)
 
-delays_grouped.reset_index(inplace=True)
-
-delays_grouped['average_delay_time_in_hours'] = delays_grouped['minutes_delayed_total'] / (60 * delays_grouped['num_of_flights_total'])
-
-delays_grouped.rename(columns={'airport_code': 'Airport Code', 'num_of_flights_total': 'Total Flights',
-                               'num_of_delays_late_aircraft': 'Number of Delayed Flights',
-                               'proportion_of_delayed_flights': 'Proportion of Late Flights',
-                               'average_delay_time_in_hours': 'Average Delay (Hours)'}, inplace=True)
-
-delays_grouped['Worst Airport Ranking'] = delays_grouped['Average Delay (Hours)'].rank(ascending=False).astype(int)
-
-delays_grouped.sort_values(by='Average Delay (Hours)', ascending=False, inplace=True)
-
-delays_grouped.reset_index(drop=True, inplace=True)
-delays_grouped.index = delays_grouped.index + 1
-
-print(delays_grouped[['Worst Airport Ranking', 'Airport Code', 'Total Flights', 'Number of Delayed Flights', 'Proportion of Late Flights', 'Average Delay (Hours)']])
-
+summary_table = df.groupby("airport_code").agg(
+    total_num_flights = ('num_of_flights_total', 'sum'),
+    total_delay_flights = ('num_of_delays_total', 'sum'),
+    avg_delay_hours = ('hours_delayed_total', 'mean'),
+).assign(
+    prop_delayed_flights = lambda x: x.total_delay_flights / x.total_num_flights
+).sort_values('prop_delayed_flights', ascending=False)
+display(HTML(summary_table.to_html()))
 
 ```
 
-_The bar graph shows the average delay time at different airports. The graph shows that ORD and ATL have a lot of delays, with ORD having a slightly higher average delay. So, ORD can be considered one of the worst airports on the list._
+_The boxplot below shows a greater than average delay time at ORD, when compared with many other airports. This would suggest that this airport is more prone to delays than other airports._
 
 ```{python}
-
-
-
-bar = alt.Chart(delays_grouped).mark_bar().encode(
-    x='Airport Code:N',
-    y='Average Delay (Hours):Q',
-    color='Airport Code:N'
-).properties(
-    title='Average Delay Time by Airport',
-    width=600,
-    height=400
+df = df.assign(average_delay_time = df.minutes_delayed_total / df.num_of_delays_total)
+title = 'Average Delay Time per Flight by Airport'
+alt.Chart(df).mark_boxplot().encode(
+    x=alt.X("average_delay_time:Q", title='Average Delay Time (minutes)'),
+    y=alt.Y("airport_code:N", sort=alt.EncodingSortField(field='average_delay_time', order='descending'), axis=alt.Axis(title='Airport Code')),
+    color=alt.Color('airport_code:N'),
 )
-
-bar
-
-
-
 ```
 
 
@@ -117,47 +117,30 @@ _According to the data, November is the best month to fly if you want to avoid d
 
 
 ```{python}
-import altair as alt
+# GQ2/GQ5 - data corrections
+df['month'] = df['month'].replace('Febuary', 'February') 
+month_df = df.dropna(subset=['month']) 
 
-months_order = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+monthly_avg_delay = month_df.groupby('month')['minutes_delayed_total', 'num_of_delays_total'].sum()
 
-delays = dat.filter(items=['month','minutes_delayed_total'])
+monthly_avg_delay['avg_delay_time'] = monthly_avg_delay['minutes_delayed_total'] / monthly_avg_delay['num_of_delays_total']
 
-delays = delays[delays['month'] != 'n/a']
-
-delays = delays.groupby('month').sum().reset_index()
-
-delays = delays.sort_values(by='minutes_delayed_total', ascending=True)
-
-delays = delays.reset_index(drop=True)
-delays.index += 1
-
-delays = delays.rename(columns={'minutes_delayed_total':'Total Minutes Delayed', 'month':'Month'})
-
-alt.Chart(delays).mark_bar().encode(
-    x=alt.X('Month:N', sort=months_order),
-    y='Total Minutes Delayed:Q',
+chart = alt.Chart(monthly_avg_delay.reset_index()).mark_bar().encode(
+    x=alt.X('month:O', sort=['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'], axis=alt.Axis(title='Month')),
+    y=alt.Y('avg_delay_time:Q', axis=alt.Axis(title='Average Delay Time (minutes)')),
+    color=alt.Color('month:N'),
 )
 
-```
-
-_The bar chart shows that November and September have fewer delays compared to the other months._
-
-```{python}
-
-import altair as alt
-
-chart = alt.Chart(delays).mark_bar().encode(
-    x=alt.X('Month:O', sort='descending', axis=alt.Axis(title='Month')),
-    y=alt.Y('Total Minutes Delayed:Q', axis=alt.Axis(title='Total Minutes Delayed')),
-    color=alt.Color('Month:N'),
-)
-
-chart.title = 'Total Minutes Delayed by Month'
+chart.title = 'Average Delay Time per Flight by Month'
 chart
 ```
 
+_The bar chart shows that September, October, and November have fewer delays compared to the other months._
 
+```{python}
+monthly_avg_delay = monthly_avg_delay.sort_values(by=['avg_delay_time'], ascending=False)
+display(HTML(monthly_avg_delay.to_html()))
+```
 
 ## GRAND QUESTION 3
 
@@ -170,16 +153,26 @@ __3) From April to August, 40% of the delayed flights in the "NAS" category are 
 
 
 ```{python}
+#%%
+mean_late_aircraft = df['num_of_delays_late_aircraft'].mean()
+df['num_of_delays_late_aircraft'] = df['num_of_delays_late_aircraft'].replace(np.nan, mean_late_aircraft)
+
+#%%
+
+
+df['weather_delay'] = 0
 
 
 
-dat['num_of_delays_late_aircraft'] = dat['num_of_delays_late_aircraft'].fillna(dat['num_of_delays_late_aircraft'].mean())
+nas_weather = np.where(df['month'].isin(['April', 'May', 'June', 'July', 'August']), df['num_of_delays_nas'] * 0.4, df['num_of_delays_nas'] * 0.65)
 
-dat['num_of_delays_due_to_weather'] = dat['num_of_delays_weather'] + dat['num_of_delays_late_aircraft'] * 0.3 + np.where((dat['month'].isin(['April', 'May', 'June', 'July', 'August'])), dat['num_of_delays_nas'] * 0.4, dat['num_of_delays_nas'] * 0.65)
+df['weather_delay'] += nas_weather + df['num_of_delays_weather'] + df['num_of_delays_late_aircraft'] * .3
 
-print(dat.head(5))
+df['weather_delay'].head(5)
 
+df.to_csv("flights_missing.csv", index=False)
 
+df[['weather_delay', 'month', 'num_of_delays_weather', 'num_of_delays_late_aircraft', 'num_of_delays_nas']].head(5)
 ```
 
 
@@ -189,24 +182,22 @@ print(dat.head(5))
 __Using the new weather variable calculated above, create a barplot showing the proportion of all flights that are delayed by weather at each airport. Discuss what you learn from this graph.__
     
 
-_The graph compares the proportion of weather delays at SFO and IAD airports. It shows that SFO has more weather delays than IAD. This could be because of the location, climate, number of flights, and resources to handle weather disruptions at SFO. IAD, which has fewer weather delays, may be better equipped to handle weather or located in an area with less weather disruptions, resulting in fewer delays._
+_The graph displays the proportion of weather-related delays for each airport in the dataset. The x-axis shows the airport codes sorted by the proportion of delayed flights due to weather in descending order, while the y-axis displays the proportion of delayed flights due to weather as a percentage. The graph indicates significant variation in the proportion of weather-related delays across different airports, highlighting the impact of weather patterns and conditions on flight delays and disruptions. The data can be useful for airlines and airport authorities to understand which airports are more susceptible to weather-related delays and develop strategies to mitigate the impact of weather on flight operations._
 
 
 ```{python}
-mean_num_of_delays_late_aircraft = dat["num_of_delays_late_aircraft"].mean()
-dat["num_of_delays_late_aircraft"].fillna(mean_num_of_delays_late_aircraft, inplace=True)
-dat["prop_delayed_by_weather"] = dat["num_of_delays_due_to_weather"] / dat["num_of_flights_total"]
+weather_delay_prop = df.groupby('airport_code')['weather_delay', 'num_of_delays_total'].sum()
+weather_delay_prop['prop_weather_delay'] = weather_delay_prop['weather_delay'] / weather_delay_prop['num_of_delays_total']
+weather_delay_prop.reset_index(inplace=True)
+weather_delay_prop.sort_values(by=['prop_weather_delay'], ascending=False)
 
-prop = alt.Chart(dat).mark_bar().encode(
-    x='airport_code:N',
-    y='prop_delayed_by_weather:Q',
-    color='airport_code:N'
-).properties(
-    title='Proportion of Flights Delayed by Weather per Airport'
-)
+bars = alt.Chart(weather_delay_prop).mark_bar().encode(
+    x=alt.X('airport_code:N', title='Airport Code', sort=alt.EncodingSortField(field='prop_weather_delay', order='descending')),
+    y=alt.Y('prop_weather_delay:Q', axis=alt.Axis(format='%', title='Proportion of Delayed Flights Due to Weather')),
+    color=alt.Color('airport_code:N', legend=None)
+).properties(title='Proportion of Delayed Flights Due to Weather by Airport')
 
-prop
-
+bars
 ```
 
 
@@ -214,20 +205,36 @@ prop
 
 __Fix all of the varied missing data types in the data to be consistent (all missing values should be displayed as “NaN”).__
 
-_The data was cleaned by replacing missing values with "NaN". Here's an example row with the "airport-name" and "minutes-delayed-carrier" values replaced with "NaN"._
+_The data was cleaned by replacing missing values with "NaN". Here's an example row with the "airport-name" and "minutes-delayed-carrier" values replaced with "NaN". Additionally, in earlier parts of the project code was cleaned in the code to ensure that everything worked without errors._
     
 
 
 ```{python}
+nan_year_rows = df.loc[df['year'].isna()]
+nan_year_rows.head(1)
 
+# additional examples of data cleaning
 
-dat = dat.replace('NA', np.NaN)
-dat = dat.replace('N/A', np.NaN)
-dat = dat.replace('', np.NaN)
-dat = dat.replace('n/a', np.NaN)
-dat = dat.replace(-999, np.NaN)
-dat = dat.fillna(value="NaN")
+#df['month'] = df['month'].replace('Febuary', 'February') 
+#month_df = df.dropna(subset=['month']) 
+#missing/incorrect values however: airport_name(''), minutes_delayed_carrier(''), num_of_delays_carrier('1500+'), num_of_delays_late_aircraft(-999), minutes_delayed_nas(-999 and ''), year(''), and month('n/a').
+# df = df.replace({
+#     'airport_name': '',
+#     'minutes_delayed_carrier': '',
+#     'num_of_delays_carrier': '1500+',
+#     'num_of_delays_late_aircraft': -999,
+#     'minutes_delayed_nas': [-999, ''],
+#     'year': '',
+#     'month': 'n/a'
+# }, np.nan)
 
-dat.iloc[2]
-
+# airport_dict = {
+#     'ATL': 'Atlanta, GA: Hartsfield-Jackson Atlanta International',
+#     'DEN': 'Denver, CO: Denver International',
+#     'IAD': 'Washington, DC: Washington Dulles International',
+#     'ORD': "Chicago, IL: Chicago O'Hare International",
+#     'SAN': 'San Diego, CA: San Diego International',
+#     'SFO': 'San Francisco, CA: San Francisco International',
+#     'SLC': 'Salt Lake City, UT: Salt Lake City International'
+# }
 ```

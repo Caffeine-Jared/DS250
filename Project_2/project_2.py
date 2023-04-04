@@ -2,7 +2,8 @@
 import pandas as pd
 import altair as alt
 import numpy as np
-from IPython.display import display, HTML
+from IPython.display import display
+from IPython.core.display import HTML
 
 #%%
 url = "https://raw.githubusercontent.com/byuidatascience/data4missing/master/data-raw/flights_missing/flights_missing.json"
@@ -10,6 +11,7 @@ df = pd.read_json(url)
 df.to_csv("flights_missing_original.csv", index=False)
 
 #%%
+# data corrections - GQ5
 df = df.replace({
     'airport_name': '',
     'minutes_delayed_carrier': '',
@@ -34,8 +36,6 @@ df['airport_name'] = df['airport_name'].fillna(df['airport_code'].map(airport_di
 
 df.to_csv("flights_missing.csv", index=False)
 
-
-
 #%%
 df = df.assign(average_delay_time = df.minutes_delayed_total / df.num_of_delays_total)
 title = 'Average Delay Time per Flight by Airport'
@@ -44,7 +44,7 @@ alt.Chart(df).mark_boxplot().encode(
     y=alt.Y("airport_code:N", sort=alt.EncodingSortField(field='average_delay_time', order='descending'), axis=alt.Axis(title='Airport Code')),
     color=alt.Color('airport_code:N'),
 )
-# %%
+    # %%
 df = df.assign(hours_delayed_total = df.minutes_delayed_total / 60)
 
 summary_table = df.groupby("airport_code").agg(
@@ -57,6 +57,7 @@ summary_table = df.groupby("airport_code").agg(
 display(HTML(summary_table.to_html()))
 
 #%%
+# GQ2/GQ5 - data corrections
 df['month'] = df['month'].replace('Febuary', 'February') 
 month_df = df.dropna(subset=['month']) 
 
@@ -74,7 +75,6 @@ chart = alt.Chart(monthly_avg_delay.reset_index()).mark_bar().encode(
     y=alt.Y('avg_delay_time:Q', axis=alt.Axis(title='Average Delay Time (minutes)')),
     color=alt.Color('month:N'),
 )
-
 chart.title = 'Average Delay Time per Flight by Month'
 chart
 
@@ -114,6 +114,7 @@ df[['weather_delay', 'month', 'num_of_delays_weather', 'num_of_delays_late_aircr
 weather_delay_prop = df.groupby('airport_code')['weather_delay', 'num_of_delays_total'].sum()
 weather_delay_prop['prop_weather_delay'] = weather_delay_prop['weather_delay'] / weather_delay_prop['num_of_delays_total']
 weather_delay_prop.reset_index(inplace=True)
+weather_delay_prop.sort_values(by=['prop_weather_delay'], ascending=False)
 
 bars = alt.Chart(weather_delay_prop).mark_bar().encode(
     x=alt.X('airport_code:N', title='Airport Code', sort=alt.EncodingSortField(field='prop_weather_delay', order='descending')),
@@ -122,8 +123,6 @@ bars = alt.Chart(weather_delay_prop).mark_bar().encode(
 ).properties(title='Proportion of Delayed Flights Due to Weather by Airport')
 
 bars
-
-weather_delay_prop.sort_values(by=['prop_weather_delay'], ascending=False)
 
 
 

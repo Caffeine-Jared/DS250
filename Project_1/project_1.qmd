@@ -58,7 +58,7 @@ _My name "Jared" was near its height of popularity when I was born in 1997, but 
 
 ```{python}
 my_name = dat.query("name == 'Jared'")
-title = "Number of Jareds born in each year"
+title = "Number of Jareds born in each year w/ 1997 highlighted"
 my_name_chart1 = alt.Chart(my_name, title=title).mark_line().encode(
     x = alt.X("year", title="Year", axis=alt.Axis(format="d")),
     y = alt.Y("Total", title="Number of Jareds"),
@@ -115,7 +115,7 @@ brittany = dat.query("name == 'Brittany'")
 # create a line chart using altair
 # ensure that the X and Y axis are labeled correctly, and that the chart has a title
 
-title = "Number of Brittanys born in each year"
+title = "Number of Brittanys born in each year w/ peak highlighted"
 brittany_chart1 = alt.Chart(brittany, title=title).mark_line().encode(
     x = alt.X("year", title="Year", axis=alt.Axis(format="d")),
     y = alt.Y("Total", title="Number of Brittanys"),

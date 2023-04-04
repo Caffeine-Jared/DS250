@@ -53,7 +53,7 @@ print(q2b_df)
 g2c_query = """
 SELECT playerID, ROUND(CAST(SUM(H) AS FLOAT) / CAST(SUM(AB) AS FLOAT), 3) AS career_batting_average
 FROM batting
-WHERE AB >= 100
+HAVING SUM(AB) >= 100
 GROUP BY playerID
 ORDER BY career_batting_average DESC
 LIMIT 5;

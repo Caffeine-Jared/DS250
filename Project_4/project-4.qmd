@@ -59,8 +59,6 @@ dwellings_neighborhoods_ml = pd.read_csv('dwellings_neighborhoods_ml.csv')
 
 alt.data_transformers.disable_max_rows()
 alt.data_transformers.enable('data_server')
-
-
 ```
 
 
