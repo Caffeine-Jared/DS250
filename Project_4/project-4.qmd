@@ -72,25 +72,19 @@ __Create 2-3 charts that evaluate potential relationships between the home varia
 
 ```{python}
 
-sns.scatterplot(x='finbsmnt', y='basement', hue='before1980', data=dwellings_ml)
-plt.title('Basement Area vs. Finished Basement Area')
-plt.xlabel('Finished Basement Area')
-plt.ylabel('Basement Area')
-plt.show()
+
 
 ```
 
 
 ```{python}
 
-sns.scatterplot(x='livearea', y='sprice', hue='before1980', data=dwellings_ml)
 
 ```
 
 
 ```{python}
 
-sns.scatterplot(x='livearea', y='totunits', hue='before1980', data=dwellings_ml)
 
 ```
 
@@ -115,6 +109,7 @@ y_pred = rf.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy: {:.2f}%".format(accuracy*100))
 
+print(metrics.classification_report(y_pred, y_test))
 ```
 
 
@@ -123,14 +118,15 @@ print("Accuracy: {:.2f}%".format(accuracy*100))
 __Justify your classification model by discussing the most important features selected by your model. This discussion should include a chart and a description of the features.__
 
 ```{python}
-print(metrics.classification_report(y_pred, y_test))
 
 ```
 
+## GRAND QUESTION 4
 
-
+__Describe the quality of your classification model using 2-3 different evaluation metrics. You also need to explain how to interpret each of the evaluation metrics you use.__
 
 ```{python}
+
 rf = RandomForestClassifier(random_state=24)
 rf.fit(X_train, y_train)
 
@@ -145,13 +141,7 @@ plt.title('ROC Curve for Random Forest Classifier')
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.show()
-```
 
-## GRAND QUESTION 4
-
-__Describe the quality of your classification model using 2-3 different evaluation metrics. You also need to explain how to interpret each of the evaluation metrics you use.__
-
-```{python}
 df_features = pd.DataFrame(
     {'f_names': X_train.columns, 
     'f_values': rf.feature_importances_}).sort_values('f_values', ascending = False)
@@ -162,6 +152,7 @@ df_features = pd.DataFrame(
         alt.Y('f_names', sort='-x', axis=alt.Axis(title='Feature Names')))
     .mark_bar()
     .properties(title='Feature Importances'))
+# print(metrics.classification_report(y_pred, y_test))
 ```
 
 
