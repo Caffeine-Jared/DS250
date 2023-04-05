@@ -37,9 +37,10 @@ import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
 from sklearn import tree
-
+from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
 from sklearn.metrics import roc_curve, auc, RocCurveDisplay
+from sklearn.metrics import accuracy_score
 
 from IPython.display import Markdown
 from IPython.display import display
@@ -97,17 +98,23 @@ sns.scatterplot(x='livearea', y='totunits', hue='before1980', data=dwellings_ml)
 
 __Build a classification model labeling houses as being built “before 1980” or “during or after 1980”. Your goal is to reach or exceed 90% accuracy. Explain your final model choice (algorithm, tuning parameters, etc) and describe what other models you tried.__
 
-
 ```{python}
-X_pred = dwellings_ml.filter(regex='sprice|livearea|finbsmnt|basement|totunits|stories|numbaths|numbdrm|abstrprd')
-y_pred = dwellings_ml.filter(regex = "before1980")
-X_train, X_test, y_train, y_test = train_test_split(
-X_pred, y_pred, test_size = .34, random_state = 76)  
 
-clf = tree.DecisionTreeClassifier()
-clf = clf.fit(X_train, y_train)
-y_pred = clf.predict(X_test)
-y_probs = clf.predict_proba(X_test)
+X = dwellings_ml.drop(['before1980', 'parcel', 'yrbuilt'], axis=1)
+y = dwellings_ml['before1980']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3,
+                                                    random_state=24, stratify=y)
+
+rf = RandomForestClassifier(random_state=24)
+
+rf.fit(X_train, y_train)
+
+y_pred = rf.predict(X_test)
+
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy: {:.2f}%".format(accuracy*100))
+
 ```
 
 
@@ -124,20 +131,20 @@ print(metrics.classification_report(y_pred, y_test))
 
 
 ```{python}
-clf = tree.DecisionTreeClassifier()
-clf = clf.fit(X_train, y_train)
+rf = RandomForestClassifier(random_state=24)
+rf.fit(X_train, y_train)
 
-y_probs = clf.predict_proba(X_test)[:, 1]
-fpr, tpr, thresholds = roc_curve(y_test, y_probs)
-
+y_pred = rf.predict_proba(X_test)[:, 1]
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
 
 roc_auc = auc(fpr, tpr)
 
-
-roc_display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='Decision Tree')
+roc_display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='Random Forest')
 roc_display.plot()
+plt.title('ROC Curve for Random Forest Classifier')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
 plt.show()
-
 ```
 
 ## GRAND QUESTION 4
@@ -147,18 +154,14 @@ __Describe the quality of your classification model using 2-3 different evaluati
 ```{python}
 df_features = pd.DataFrame(
     {'f_names': X_train.columns, 
-    'f_values': clf.feature_importances_}).sort_values('f_values', ascending = False)
-```
+    'f_values': rf.feature_importances_}).sort_values('f_values', ascending = False)
 
-
-
-```{python}
 (alt.Chart(df_features.query('f_values > .011'))
     .encode(
-        alt.X('f_values'),
-        alt.Y('f_names', sort = '-x'))
-    .mark_bar())
-
+        alt.X('f_values', axis=alt.Axis(title='Feature Values')),
+        alt.Y('f_names', sort='-x', axis=alt.Axis(title='Feature Names')))
+    .mark_bar()
+    .properties(title='Feature Importances'))
 ```
 
 
