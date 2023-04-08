@@ -33,10 +33,11 @@ import altair as alt
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score
 
 from sklearn.model_selection import train_test_split
 from sklearn import tree
-
+from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
 from sklearn.metrics import roc_curve, auc, RocCurveDisplay
 
@@ -48,7 +49,7 @@ from tabulate import tabulate
 
 ## Elevator pitch
 
-_A SHORT (4-5 SENTENCES) PARAGRAPH THAT `SUMMARIZES` THE WORK REQUESTED INCLUDING THE TOP RESULTS._
+_With this data analysis, our customer will discover the force within their customer base. We've analyzed extensive Star Wars data, including gender, age, and income, to predict whether someone is a fan of the franchise and earns over $50,000 a year. Our model has demonstrated impressive accuracy and provides valuable insights into the key factors influencing these outcomes. With this data, our client will be able to harness the power of this innovative tool to excel in their marketing efforts and grow their business in a galaxy not so far away._
 
 _A Client has requested this analysis and  this is your one shot of  what you would say to your boss in a 2min elevator ride before he takes your report and hands it to the client._
 
@@ -59,7 +60,7 @@ _A Client has requested this analysis and  this is your one shot of  what you wo
 url = 'https://raw.githubusercontent.com/fivethirtyeight/data/master/star-wars-survey/StarWars.csv'
 df = pd.read_csv(url, encoding='ISO-8859-1')
 alt.data_transformers.disable_max_rows()
-alt.data_transformers.enable('data_server')
+alt.data_transformers.enable('json')
 ```
 
 __Highlight the grand questions__
@@ -134,8 +135,13 @@ header
 ## GRAND QUESTION 2
 
 __Clean and format the data so that it can be used in a machine learning model. As you format the data, you should complete each item listed below. In your final report provide example(s) of the reformatted data with a short description of the changes made.__
+The changes that were made to the data were:
+- Convert the columns that are Yes/No to 1/0
+- Fill in the missing values with the mean of the column
+- Filter the dataset to respondents that have seen at least one film
+- Change favorable-character section to integers
 
-_Filter the dataset to respondents that have seen at least one film._
+_Filter the dataset to respondents that have seen at least one film. _
 
 ```{python}
 columns_to_convert = ['star_wars_watched', 'star_wars_fan', 'expanded_universe_familiar', 'expanded_universe_fan', 'star_trek_fan']
@@ -162,11 +168,22 @@ df_shot_first = df[df['shot_first'].notnull()]
 
 df.head(5)
 
+for column in df.columns:
+    if 'favorable_character' in column:
+        df[column] = df[column].replace({
+            '^.*Very favorably.*$': 6,
+            '^.*Somewhat favorably.*$': 5,
+            '^.*Neither favorably nor unfavorably \(neutral\)\.*$': 3,
+            '^.*Somewhat unfavorably.*$': 2,
+            '^.*Very unfavorably.*$': 1,
+            '^.*Unfamiliar \(N/A\)\.*$': 4
+        }, regex=True)
+
 
 ```
 
 _Create a new column that converts the age ranges to a single number. Drop the age range categorical column._
-
+Converted age ranges to integers.
 ```{python}
 
 df = df.dropna(subset=['Gender'])
@@ -181,6 +198,7 @@ df['Age'].value_counts(dropna=False)
 
 _Create a new column that converts the education groupings to a single number. Drop the school categorical column_
 
+
 ```{python}
 
 df['Education'] = df['Education'].replace({
@@ -191,6 +209,8 @@ df['Education'] = df['Education'].replace({
     '^Less than high school degree$': 5,
     np.nan: 6
 }, regex=True)
+
+
 
 df['Education'].value_counts(dropna=False)
 
@@ -227,7 +247,9 @@ df['target'] = (df['household_income'] >= 3).astype(int)
 df['target'].value_counts(dropna=False)
 
 
+
 ```
+
 
 
 _One-hot encode all remaining categorical columns._
@@ -242,7 +264,6 @@ df.drop('location', axis=1, inplace=True)
 
 
 df.head()
-
 
 ```
 
@@ -322,57 +343,62 @@ __Build a machine learning model that predicts whether a person makes more than 
 
 _Model_
 
+The accuracy of the model is reported as 55.69%, which means that the model correctly predicted the target class for 55.69% of the observations in the test set. The precision and recall values are also reported for each class, along with the F1 score, support, and macro- and weighted-average metrics.
+
+Based on the classification report, it seems that the model is performing slightly better for the positive class (class 1) compared to the negative class (class 0), with precision and recall values of 0.57 and 0.58, respectively, compared to 0.55 and 0.53 for the negative class. The F1 score is slightly higher for the positive class as well (0.57 vs. 0.54). The dataset is divided into training and testing portions, with a Random Forest Classifier employed to develop the predictive model. 
+
+I split the dataset into training and testing parts, and used a Random Forest Classifier to create the prediction model. I gauged the model's effectiveness by examining accuracy and a range of classification metrics. Furthermore, I showcased the importance of individual features through a neat table and an eye-catching bar chart. To delve deeper into the model's performance, I plotted a Receiver Operating Characteristic (ROC) curve, which highlighted the trade-off between true positive and false positive rates while exploring various decision thresholds.
 ```{python}
-X_pred = df.filter(regex='Education|household_income|Age')
-y_pred = df.filter(regex = 'target')
-X_train, X_test, y_train, y_test = train_test_split(
-X_pred, y_pred, test_size = .34, random_state = 76)  
-
-clf = tree.DecisionTreeClassifier()
-clf = clf.fit(X_train, y_train)
-y_pred = clf.predict(X_test)
-y_probs = clf.predict_proba(X_test)
+#%%
+df.fillna(df.median(), inplace=True)
+X = df.drop(['household_income', 'target', 'shot_first'], axis=1)
+y = df.filter(regex = 'target')
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=24, stratify=y)
 
 
-```
+#%%
+rf = RandomForestClassifier(random_state=24)
 
-```{python}
+#%%
+rf.fit(X_train, y_train)
+
+y_pred = rf.predict(X_test)
+
+
+#%% 
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy: {:.2f}%".format(accuracy*100))
+
+#%%
 print(metrics.classification_report(y_pred, y_test))
 
-```
+#%% 
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy: {:.2f}%".format(accuracy*100))
 
-_Accuracy_
+# %%
+df_features = pd.DataFrame(
+    {'f_names': X_train.columns, 
+    'f_values': rf.feature_importances_}).sort_values('f_values', ascending = False)
 
-```{python}
+# %%
 
-clf = tree.DecisionTreeClassifier()
-clf = clf.fit(X_train, y_train)
 
-y_probs = clf.predict_proba(X_test)[:, 1]
+# %%
+
+y_probs = rf.predict_proba(X_test)[:, 1]
 fpr, tpr, thresholds = roc_curve(y_test, y_probs)
-
 
 roc_auc = auc(fpr, tpr)
 
-
-roc_display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='Decision Tree')
+roc_display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='Random Forest Classifier')
 roc_display.plot()
 plt.show()
 
-```
-
-```{python}
-df_features = pd.DataFrame(
-    {'f_names': X_train.columns, 
-    'f_values': clf.feature_importances_}).sort_values('f_values', ascending = False)
-```
-
-```{python}
 (alt.Chart(df_features.query('f_values > .011'))
     .encode(
         alt.X('f_values'),
         alt.Y('f_names', sort = '-x'))
     .mark_bar())
-
 ```
 

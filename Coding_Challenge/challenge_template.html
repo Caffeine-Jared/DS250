@@ -96,6 +96,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <script src="challenge_template_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="challenge_template_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="challenge_template_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -110,27 +113,320 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <section id="cse-250-coding-challenge" class="level3">
 <h3 class="anchored" data-anchor-id="cse-250-coding-challenge">CSE 250 Coding Challenge</h3>
-<p><strong>[Author Name]</strong></p>
+<p><strong>Jared Linares</strong></p>
 </section>
 <section id="challenge-summary" class="level3">
 <h3 class="anchored" data-anchor-id="challenge-summary">Challenge Summary</h3>
 <p><em>After completing the challenge, describe how you think you did.</em></p>
 <section id="challenge-1" class="level4">
 <h4 class="anchored" data-anchor-id="challenge-1">Challenge 1</h4>
-<section id="answer" class="level5">
-<h5 class="anchored" data-anchor-id="answer">Answer</h5>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Split Entry houses are a failed building experiment in the United States. Use the data from our Denver homes project, as shown below, to recreate the following graphic. ##### Answer</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> altair <span class="im">as</span> alt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> tree</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> GradientBoostingClassifier</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <p><em>Include the image, answer, or table here</em></p>
-</section>
 <section id="code" class="level5">
 <h5 class="anchored" data-anchor-id="code">Code</h5>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>final_python <span class="op">=</span> <span class="st">'code'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://github.com/byuidatascience/data4dwellings/raw/master/data-raw/dwellings_denver/dwellings_denver.csv'</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>dat_home <span class="op">=</span> pd.read_csv(url).sample(n<span class="op">=</span><span class="dv">4500</span>, random_state<span class="op">=</span><span class="dv">15</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>dat_home.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>parcel</th>
+      <th>nbhd</th>
+      <th>abstrprd</th>
+      <th>livearea</th>
+      <th>finbsmnt</th>
+      <th>basement</th>
+      <th>yrbuilt</th>
+      <th>condition</th>
+      <th>quality</th>
+      <th>totunits</th>
+      <th>...</th>
+      <th>numbaths</th>
+      <th>arcstyle</th>
+      <th>sprice</th>
+      <th>deduct</th>
+      <th>netprice</th>
+      <th>tasp</th>
+      <th>smonth</th>
+      <th>syear</th>
+      <th>qualified</th>
+      <th>status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1466</th>
+      <td>00195-11-021-000</td>
+      <td>1</td>
+      <td>1112</td>
+      <td>921</td>
+      <td>460</td>
+      <td>921</td>
+      <td>1983</td>
+      <td>AVG</td>
+      <td>C</td>
+      <td>1</td>
+      <td>...</td>
+      <td>2</td>
+      <td>ONE-STORY</td>
+      <td>72800</td>
+      <td>0</td>
+      <td>72800</td>
+      <td>72800</td>
+      <td>12</td>
+      <td>2011</td>
+      <td>U</td>
+      <td>I</td>
+    </tr>
+    <tr>
+      <th>5114</th>
+      <td>01334-30-013-000</td>
+      <td>124</td>
+      <td>1112</td>
+      <td>955</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1949</td>
+      <td>Good</td>
+      <td>C</td>
+      <td>1</td>
+      <td>...</td>
+      <td>2</td>
+      <td>ONE-STORY</td>
+      <td>131500</td>
+      <td>0</td>
+      <td>131500</td>
+      <td>131500</td>
+      <td>12</td>
+      <td>2011</td>
+      <td>Q</td>
+      <td>I</td>
+    </tr>
+    <tr>
+      <th>244</th>
+      <td>00141-59-014-000</td>
+      <td>5</td>
+      <td>1112</td>
+      <td>1420</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2012</td>
+      <td>AVG</td>
+      <td>C</td>
+      <td>1</td>
+      <td>...</td>
+      <td>3</td>
+      <td>TWO-STORY</td>
+      <td>17113000</td>
+      <td>0</td>
+      <td>17113000</td>
+      <td>17113000</td>
+      <td>12</td>
+      <td>2010</td>
+      <td>U</td>
+      <td>V</td>
+    </tr>
+    <tr>
+      <th>3954</th>
+      <td>01301-26-011-000</td>
+      <td>105</td>
+      <td>1112</td>
+      <td>1336</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1953</td>
+      <td>Good</td>
+      <td>C</td>
+      <td>1</td>
+      <td>...</td>
+      <td>2</td>
+      <td>ONE AND HALF-STORY</td>
+      <td>189000</td>
+      <td>4000</td>
+      <td>185000</td>
+      <td>190472</td>
+      <td>10</td>
+      <td>2011</td>
+      <td>Q</td>
+      <td>I</td>
+    </tr>
+    <tr>
+      <th>16098</th>
+      <td>05243-02-016-000</td>
+      <td>530</td>
+      <td>1112</td>
+      <td>896</td>
+      <td>796</td>
+      <td>896</td>
+      <td>1938</td>
+      <td>AVG</td>
+      <td>C</td>
+      <td>1</td>
+      <td>...</td>
+      <td>2</td>
+      <td>ONE-STORY</td>
+      <td>310000</td>
+      <td>5000</td>
+      <td>305000</td>
+      <td>305000</td>
+      <td>7</td>
+      <td>2011</td>
+      <td>Q</td>
+      <td>I</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 26 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>arcstyle_colors <span class="op">=</span> {style: color <span class="cf">for</span> style, color <span class="kw">in</span> <span class="bu">zip</span>(dat_home[<span class="st">'arcstyle'</span>].unique(), plt.cm.tab10.colors)}</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>rannge <span class="op">=</span> [<span class="dv">100</span>,<span class="dv">200</span>,<span class="dv">300</span>,<span class="dv">400</span>,<span class="dv">500</span>,<span class="dv">1000</span>,<span class="dv">2000</span>,<span class="dv">3000</span>,<span class="dv">4000</span>,<span class="dv">5000</span>,<span class="dv">10000</span>]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>keys <span class="op">=</span> [<span class="st">'ONE-STORY'</span>,<span class="st">'TWO-STORY'</span>,<span class="st">'ONE AND HALF-STORY'</span>]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> style, color <span class="kw">in</span> arcstyle_colors.items():</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> style <span class="kw">in</span> keys:</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        plt.scatter(dat_home[dat_home[<span class="st">'arcstyle'</span>] <span class="op">==</span> style][<span class="st">'yrbuilt'</span>],</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                    dat_home[dat_home[<span class="st">'arcstyle'</span>] <span class="op">==</span> style][<span class="st">'livearea'</span>],</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                    c<span class="op">=</span>color,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>                    alpha<span class="op">=</span><span class="fl">0.5</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                    label<span class="op">=</span>style)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>       </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>plt.yticks(rannge)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Thank goodness 21st Century homes are not split levels!'</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Year Built'</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Total Living Area'</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>plt.legend(title<span class="op">=</span><span class="st">'Architectural Style'</span>, loc<span class="op">=</span><span class="st">'best'</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>*c* argument looks like a single numeric RGB or RGBA sequence, which should be avoided as value-mapping will have precedence in case its length matches with *x* &amp; *y*.  Please use the *color* keyword-argument or provide a 2D array with a single row if you intend to specify the same RGB or RGBA value for all points.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>*c* argument looks like a single numeric RGB or RGBA sequence, which should be avoided as value-mapping will have precedence in case its length matches with *x* &amp; *y*.  Please use the *color* keyword-argument or provide a 2D array with a single row if you intend to specify the same RGB or RGBA value for all points.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>*c* argument looks like a single numeric RGB or RGBA sequence, which should be avoided as value-mapping will have precedence in case its length matches with *x* &amp; *y*.  Please use the *color* keyword-argument or provide a 2D array with a single row if you intend to specify the same RGB or RGBA value for all points.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="challenge_template_files/figure-html/cell-4-output-4.png" width="610" height="449"></p>
+</div>
+</div>
 </section>
 </section>
 <section id="challenge-2" class="level4">
 <h4 class="anchored" data-anchor-id="challenge-2">Challenge 2</h4>
-<p>…</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>mister <span class="op">=</span> pd.Series([<span class="st">"lost"</span>, <span class="dv">15</span>, <span class="dv">22</span>, <span class="dv">45</span>, <span class="dv">31</span>, <span class="st">"lost"</span>, <span class="dv">85</span>, <span class="dv">38</span>, <span class="dv">129</span>, <span class="dv">80</span>, <span class="dv">21</span>, <span class="dv">2</span>])</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(mister)):</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> mister[i] <span class="op">==</span> <span class="st">"lost"</span>:</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        mister[i] <span class="op">=</span> <span class="dv">125</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>plt.boxplot(mister)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Box Plot of Mister Series'</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Values'</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="challenge_template_files/figure-html/cell-5-output-1.png" width="593" height="431"></p>
+</div>
+</div>
+</section>
+<section id="challenge-3" class="level4">
+<h4 class="anchored" data-anchor-id="challenge-3">Challenge 3</h4>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>mister <span class="op">=</span> pd.Series([<span class="st">"lost"</span>, <span class="dv">15</span>, <span class="dv">22</span>, <span class="dv">45</span>, <span class="dv">31</span>, <span class="st">"lost"</span>, <span class="dv">85</span>, <span class="dv">38</span>, <span class="dv">129</span>, <span class="dv">80</span>, <span class="dv">21</span>, <span class="dv">2</span>])</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(mister)):</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> mister[i] <span class="op">==</span> <span class="st">"lost"</span>:</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        mister[i] <span class="op">=</span> <span class="dv">125</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">round</span>(mister.mean(), <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>59.83</code></pre>
+</div>
+</div>
+</section>
+<section id="challenge-4" class="level4">
+<h4 class="anchored" data-anchor-id="challenge-4">Challenge 4</h4>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://github.com/byuidatascience/data4python4ds/raw/master/data-raw/table1/table1.json'</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Read JSON data from the URL</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_json(url)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>df</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># filter data to keep only cases column and 1999/2000 years</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[df[<span class="st">'year'</span>].isin([<span class="dv">1999</span>, <span class="dv">2000</span>])]</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[[<span class="st">'country'</span>, <span class="st">'year'</span>, <span class="st">'cases'</span>]]</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.pivot(index<span class="op">=</span><span class="st">'country'</span>, columns<span class="op">=</span><span class="st">'year'</span>, values<span class="op">=</span><span class="st">'cases'</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>df.head(<span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th>year</th>
+      <th>1999</th>
+      <th>2000</th>
+    </tr>
+    <tr>
+      <th>country</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Afghanistan</th>
+      <td>745</td>
+      <td>2666</td>
+    </tr>
+    <tr>
+      <th>Brazil</th>
+      <td>37737</td>
+      <td>80488</td>
+    </tr>
+    <tr>
+      <th>China</th>
+      <td>212258</td>
+      <td>213766</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="challenge-5" class="level4">
+<h4 class="anchored" data-anchor-id="challenge-5">Challenge 5</h4>
 </section>
 </section>
 
